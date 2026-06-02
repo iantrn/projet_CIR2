@@ -18,7 +18,7 @@ function switchMode(mode) {
         btnUser.classList.remove('active');
         adminElements.forEach(el => el.classList.remove('hidden'));
         
-        // On bascule sur la bannière noire
+        // Changement vers la bannière noire
         appHeader.classList.remove('user-mode');
         appHeader.classList.add('admin-mode');
     } else {
@@ -26,7 +26,7 @@ function switchMode(mode) {
         btnAdmin.classList.remove('active');
         adminElements.forEach(el => el.classList.add('hidden'));
         
-        // On bascule sur la bannière bleue
+        // Changement vers la bannière bleue
         appHeader.classList.remove('admin-mode');
         appHeader.classList.add('user-mode');
     }
