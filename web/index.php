@@ -20,6 +20,12 @@ require_once 'config/db.php';
         </div>
     </header>
 
+    <nav id="app-navbar" class="app-navbar user-mode-nav">
+        <button class="nav-btn">Accueil</button>
+        <button class="nav-btn">Recherche</button>
+        <button class="nav-btn">Carte</button>
+    </nav>
+
     <main class="main-container">
         
         <section class="sidebar">

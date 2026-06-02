@@ -11,6 +11,7 @@ const btnUser = document.getElementById('btn-mode-user');
 const btnAdmin = document.getElementById('btn-mode-admin');
 const adminElements = document.querySelectorAll('.admin-only');
 const appHeader = document.getElementById('app-header');
+const appNavbar = document.getElementById('app-navbar');
 
 function switchMode(mode) {
     if (mode === 'admin') {
@@ -18,18 +19,25 @@ function switchMode(mode) {
         btnUser.classList.remove('active');
         adminElements.forEach(el => el.classList.remove('hidden'));
         
-        // Changement vers la bannière noire
+        // Changement vers la bannière et la navbar admin (noires)
         appHeader.classList.remove('user-mode');
         appHeader.classList.add('admin-mode');
+        appNavbar.classList.remove('user-mode-nav');
+        appNavbar.classList.add('admin-mode-nav');
     } else {
         btnUser.classList.add('active');
         btnAdmin.classList.remove('active');
         adminElements.forEach(el => el.classList.add('hidden'));
         
-        // Changement vers la bannière bleue
+        // Changement vers la bannière et la navbar utilisateur (bleues)
         appHeader.classList.remove('admin-mode');
         appHeader.classList.add('user-mode');
+        appNavbar.classList.remove('admin-mode-nav');
+        appNavbar.classList.add('user-mode-nav');
     }
+    
+    // Petite astuce pour forcer Leaflet à recalculer sa taille suite au changement CSS adaptatif
+    setTimeout(() => { map.invalidateSize(); }, 300);
 }
 
 btnUser.addEventListener('click', () => switchMode('user'));

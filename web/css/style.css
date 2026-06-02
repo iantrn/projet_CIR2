@@ -13,23 +13,22 @@ body {
     background-color: #f4f6f7;
 }
 
-/* ================= BANNIÈRE / NAVBAR ================= */
+/* ================= BANNIÈRE / HEADER ================= */
 .app-header {
     position: relative;
-    height: 150px; /* Hauteur fixe idéale pour afficher la bannière */
+    height: 150px;
     width: 100%;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     display: flex;
-    justify-content: flex-end; /* Aligne le switcher à droite */
-    align-items: flex-end;     /* Aligne le switcher en bas */
-    padding: 15px 25px;        /* Marge interne pour détacher les boutons du bord */
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding: 15px 25px;
     transition: background-image 0.4s ease-in-out;
 }
 
-/* Chargement des bannières selon la classe */
 .app-header.user-mode {
     background-image: url('../img/baniere_bleue.png');
 }
@@ -37,18 +36,18 @@ body {
     background-image: url('../img/baniere_noire.png');
 }
 
-/* Style "Pilule/Glassmorphism" pour le conteneur des boutons */
+/* Sélecteur de mode */
 .mode-switcher {
     display: flex;
     gap: 4px;
     background: rgba(0, 0, 0, 0.25);
     padding: 5px;
     border-radius: 30px;
-    backdrop-filter: blur(8px); /* Flou d'arrière-plan ultra-moderne */
+    backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 10;
 }
 
-/* Boutons du Switcher */
 .btn { 
     padding: 8px 20px; 
     border: none; 
@@ -60,33 +59,56 @@ body {
     font-size: 14px;
     transition: all 0.3s ease;
 }
-.btn:hover {
-    color: white;
-}
 
-/* Style du bouton actif en Mode Utilisateur (Blanc) */
 .user-mode .btn.active { 
     background-color: white; 
     color: #2c3e50; 
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
-/* Style du bouton actif en Mode Admin (Jaune pour rappeler le figma admin) */
 .admin-mode .btn.active { 
     background-color: #f1c40f; 
     color: #111; 
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
+/* ================= NAVBAR (TEXTE BLANC) ================= */
+.app-navbar {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    padding: 12px 20px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.4s ease;
+    z-index: 5;
+}
 
-/* ================= STRUCTURE SPLIT SCREEN ================= */
+.app-navbar.user-mode-nav { background-color: #3498db; }
+.app-navbar.admin-mode-nav { background-color: #1a1a1a; }
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    padding: 4px 12px;
+    transition: all 0.2s ease;
+}
+.nav-btn:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+/* ================= STRUCTURE SPLIT SCREEN (PC) ================= */
 .main-container {
     display: flex;
     flex: 1;
-    height: calc(100vh - 150px); /* S'adapte parfaitement aux 150px du header */
+    height: calc(100vh - 150px - 45px); /* Header + Navbar */
 }
 
-/* Panneau latéral gauche */
 .sidebar {
     width: 380px;
     background-color: white;
@@ -102,7 +124,6 @@ body {
     gap: 8px;
     margin-bottom: 15px;
 }
-
 .search-box input {
     flex: 1;
     padding: 10px;
@@ -111,7 +132,6 @@ body {
     font-size: 14px;
 }
 
-/* Zone de défilement (Scroll) */
 .list-container {
     flex: 1;
     display: flex;
@@ -119,7 +139,6 @@ body {
     overflow: hidden;
     margin-top: 15px;
 }
-
 .scrollable-list {
     flex: 1;
     overflow-y: auto;
@@ -134,30 +153,26 @@ body {
     border: 1px solid #eaeaea;
     transition: transform 0.2s;
 }
-
 .station-card:hover {
     transform: translateY(-2px);
     border-color: #3498db;
 }
-
 .card-buttons {
     margin-top: 12px;
     display: flex;
     gap: 8px;
 }
 
-/* Zone Carte Droite */
 .map-container {
     flex: 1;
     height: 100%;
 }
-
 #map {
     width: 100%;
     height: 100%;
 }
 
-/* Autres Boutons de l'application */
+/* Boutons secondaires */
 .btn-primary { background: #3498db; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
 .btn-success { background: #2ecc71; color: white; border: none; padding: 12px; border-radius: 4px; width: 100%; cursor: pointer; font-weight: bold; margin-bottom: 15px;}
 .btn-small { padding: 6px 12px; font-size: 13px; border: none; border-radius: 4px; cursor: pointer; }
@@ -172,21 +187,56 @@ body {
     display: flex; justify-content: center; align-items: center;
     z-index: 9999;
 }
-
 .modal-content {
     background: white; padding: 25px; border-radius: 8px;
-    width: 100%; max-width: 450px; position: relative;
+    width: 90%; max-width: 450px; position: relative; /* 90% pour éviter les collisions sur petit écran */
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
-
 .modal-content label { display: block; margin-top: 10px; font-weight: 600; font-size: 14px; }
 .modal-content input { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
-
-.close-modal {
-    position: absolute; top: 12px; right: 18px;
-    font-size: 26px; cursor: pointer; color: #aaa;
-}
+.close-modal { position: absolute; top: 12px; right: 18px; font-size: 26px; cursor: pointer; color: #aaa; }
 .close-modal:hover { color: #000; }
 
-/* Classes Utilitaires */
 .hidden { display: none !important; }
+
+
+/* ==========================================================================
+   MÉDIA QUERIES : RESPONSIVE DESIGN (Smartphones & Tablettes)
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* 1. On diminue la hauteur du header pour gagner de la place */
+    .app-header {
+        height: 110px;
+        padding: 10px 15px;
+    }
+    .mode-switcher { padding: 4px; }
+    .btn { padding: 6px 14px; font-size: 12px; }
+
+    /* 2. On resserre la navbar */
+    .app-navbar {
+        gap: 25px;
+        padding: 10px;
+    }
+    .nav-btn { font-size: 14px; }
+
+    /* 3. On bascule le Split Screen en mode vertical (Top / Bottom) */
+    .main-container {
+        flex-direction: column;
+        height: calc(100vh - 110px - 41px); /* Hauteur calculée dynamiquement */
+    }
+
+    /* 4. La liste prend la moitié haute de l'écran restant */
+    .sidebar {
+        width: 100%;
+        height: 50%;
+        border-right: none;
+        border-bottom: 1px solid #e1e8ed;
+        padding: 15px;
+    }
+
+    /* 5. La carte prend la moitié basse de l'écran restant */
+    .map-container {
+        width: 100%;
+        height: 50%;
+    }
+}
