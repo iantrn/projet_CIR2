@@ -1,5 +1,4 @@
 <?php 
-// On inclut la connexion à la BDD pour être prêt à faire des requêtes plus tard
 require_once 'config/db.php'; 
 ?>
 <!DOCTYPE html>
@@ -7,14 +6,14 @@ require_once 'config/db.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BreizhWatt - Bornes de Recharge IRVE</title>
+    <title>BreizhWatt</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
     <header class="app-header">
-        <h1>⚡ BreizhWatt</h1>
+        <h1>BreizhWatt</h1>
         <div class="mode-switcher">
             <button id="btn-mode-user" class="btn active">Mode Utilisateur</button>
             <button id="btn-mode-admin" class="btn">Mode Admin</button>
