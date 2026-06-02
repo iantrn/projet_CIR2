@@ -36,7 +36,7 @@ function switchMode(mode) {
         appNavbar.classList.add('user-mode-nav');
     }
     
-    // Petite astuce pour forcer Leaflet à recalculer sa taille suite au changement CSS adaptatif
+    // Forcer Leaflet à recalculer sa taille suite au changement CSS adaptatif
     setTimeout(() => { map.invalidateSize(); }, 300);
 }
 

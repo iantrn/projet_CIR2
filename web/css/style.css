@@ -13,30 +13,33 @@ body {
     background-color: #f4f6f7;
 }
 
-/* ================= BANNIÈRE / HEADER ================= */
+/* ================= BANNIÈRE / HEADER (PC) ================= */
 .app-header {
     position: relative;
     height: 150px;
     width: 100%;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    background-size: contain; /* L'image s'affiche désormais ENTIÈREMENT sans zoom forcé */
     display: flex;
     justify-content: flex-end;
     align-items: flex-end;
     padding: 15px 25px;
-    transition: background-image 0.4s ease-in-out;
+    transition: background 0.4s ease-in-out;
 }
 
+/* Couleurs de fond adaptées pour fusionner avec les bords des bannières sur grand écran */
 .app-header.user-mode {
     background-image: url('../img/baniere_bleue.png');
+    background-color: #0c1c3e; 
 }
 .app-header.admin-mode {
     background-image: url('../img/baniere_noire.png');
+    background-color: #000000;
 }
 
-/* Sélecteur de mode */
+/* Sélecteur de mode (PC) */
 .mode-switcher {
     display: flex;
     gap: 4px;
@@ -189,7 +192,7 @@ body {
 }
 .modal-content {
     background: white; padding: 25px; border-radius: 8px;
-    width: 90%; max-width: 450px; position: relative; /* 90% pour éviter les collisions sur petit écran */
+    width: 90%; max-width: 450px; position: relative;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 .modal-content label { display: block; margin-top: 10px; font-weight: 600; font-size: 14px; }
@@ -204,13 +207,24 @@ body {
    MÉDIA QUERIES : RESPONSIVE DESIGN (Smartphones & Tablettes)
    ========================================================================== */
 @media (max-width: 768px) {
-    /* 1. On diminue la hauteur du header pour gagner de la place */
+    /* 1. Header sur mobile */
     .app-header {
         height: 110px;
         padding: 10px 15px;
+        background-size: cover; /* On garde cover uniquement sur mobile car le rendu te plaisait */
     }
-    .mode-switcher { padding: 4px; }
-    .btn { padding: 6px 14px; font-size: 12px; }
+    
+    /* RETRECISSEMENT DES BOUTONS SUR MOBILE */
+    .mode-switcher { 
+        padding: 3px; 
+        gap: 2px;
+        border-radius: 20px;
+    }
+    .btn { 
+        padding: 5px 12px; 
+        font-size: 11px; /* Écrit plus petit */
+        border-radius: 15px;
+    }
 
     /* 2. On resserre la navbar */
     .app-navbar {
@@ -222,7 +236,7 @@ body {
     /* 3. On bascule le Split Screen en mode vertical (Top / Bottom) */
     .main-container {
         flex-direction: column;
-        height: calc(100vh - 110px - 41px); /* Hauteur calculée dynamiquement */
+        height: calc(100vh - 110px - 41px);
     }
 
     /* 4. La liste prend la moitié haute de l'écran restant */
