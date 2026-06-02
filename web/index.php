@@ -1,4 +1,5 @@
 <?php 
+// On inclut la connexion à la BDD pour être prêt à faire des requêtes
 require_once 'config/db.php'; 
 ?>
 <!DOCTYPE html>
@@ -6,35 +7,42 @@ require_once 'config/db.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BreizhWatt</title>
+    <title>BreizhWatt - Bornes de Recharge IRVE</title>
+    <!-- CSS de Leaflet pour l'affichage de la carte -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <header class="app-header">
-        <h1>BreizhWatt</h1>
+    <!-- Barre de navigation supérieure (avec la classe user-mode par défaut) -->
+    <header id="app-header" class="app-header user-mode">
+        <h1>⚡ BreizhWatt</h1>
         <div class="mode-switcher">
             <button id="btn-mode-user" class="btn active">Mode Utilisateur</button>
             <button id="btn-mode-admin" class="btn">Mode Admin</button>
         </div>
     </header>
 
+    <!-- Conteneur Principal (Split Screen) -->
     <main class="main-container">
         
+        <!-- Colonne Gauche : Recherche & Liste (Défilement) -->
         <section class="sidebar">
             <div class="search-box">
                 <input type="text" id="search-input" placeholder="Rechercher une ville, une station...">
                 <button id="btn-search" class="btn-primary">Rechercher</button>
             </div>
 
+            <!-- Actions réservées à l'Admin (Cachées par défaut) -->
             <div id="admin-actions" class="admin-only hidden">
                 <button id="btn-add-station" class="btn-success">+ Ajouter une station</button>
             </div>
 
+            <!-- Zone de Défilement des Bornes -->
             <div class="list-container" id="stations-list">
                 <h3>Stations à proximité</h3>
                 <div class="scrollable-list">
+                    <!-- Exemple statique - Sera généré dynamiquement par le JS plus tard -->
                     <div class="station-card">
                         <h4>Electric 50 Charg</h4>
                         <p>4 Rue de l'Énergie, Rennes</p>
@@ -47,12 +55,16 @@ require_once 'config/db.php';
             </div>
         </section>
 
+        <!-- Colonne Droite : La Carte Interactive -->
         <section class="map-container">
             <div id="map"></div>
         </section>
 
     </main>
 
+    <!-- ================= FENÊTRES MODALES (Cachées par défaut) ================= -->
+
+    <!-- 1. Modal Détails de la Station -->
     <div id="modal-detail" class="modal hidden">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
@@ -61,6 +73,7 @@ require_once 'config/db.php';
         </div>
     </div>
 
+    <!-- 2. Modal Ajouter une Station (Admin) -->
     <div id="modal-add" class="modal hidden">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
@@ -77,6 +90,7 @@ require_once 'config/db.php';
         </div>
     </div>
 
+    <!-- 3. Modal Modifier une Station (Admin) -->
     <div id="modal-edit" class="modal hidden">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
@@ -92,6 +106,7 @@ require_once 'config/db.php';
         </div>
     </div>
 
+    <!-- Librairie Leaflet JS et notre script principal -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="js/main.js"></script>
 </body>

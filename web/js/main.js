@@ -6,20 +6,29 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
-// 2. Gestion de la bascule Mode Utilisateur / Mode Admin (Figma "Mode Admin/User")
+// 2. Gestion de la bascule Mode Utilisateur / Mode Admin
 const btnUser = document.getElementById('btn-mode-user');
 const btnAdmin = document.getElementById('btn-mode-admin');
 const adminElements = document.querySelectorAll('.admin-only');
+const appHeader = document.getElementById('app-header');
 
 function switchMode(mode) {
     if (mode === 'admin') {
         btnAdmin.classList.add('active');
         btnUser.classList.remove('active');
         adminElements.forEach(el => el.classList.remove('hidden'));
+        
+        // On bascule sur la bannière noire
+        appHeader.classList.remove('user-mode');
+        appHeader.classList.add('admin-mode');
     } else {
         btnUser.classList.add('active');
         btnAdmin.classList.remove('active');
         adminElements.forEach(el => el.classList.add('hidden'));
+        
+        // On bascule sur la bannière bleue
+        appHeader.classList.remove('admin-mode');
+        appHeader.classList.add('user-mode');
     }
 }
 
@@ -62,7 +71,7 @@ document.getElementById('stations-list').addEventListener('click', (e) => {
     
     // Clic sur bouton "Modifier" (Visible uniquement en Admin)
     if (e.target.classList.contains('btn-edit')) {
-        document.getElementById('edit-station-id').value = "123"; // ID fictif pour l'instant
+        document.getElementById('edit-station-id').value = "123"; 
         document.getElementById('edit-nom').value = "Electric 50 Charg";
         document.getElementById('edit-tarif').value = "0.45€ / kWh";
         modalEdit.classList.remove('hidden');
