@@ -91,4 +91,9 @@ try {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="js/main.js"></script>
 </body>
+<?php if (!empty($error_msg)): ?>
+    <div style="background-color: #ffebee; color: #c62828; border: 2px solid #ef5350; padding: 15px; margin: 20px; border-radius: 8px; font-family: sans-serif; font-weight: bold;">
+        ⚠️ Erreur détectée : <?= htmlspecialchars($error_msg) ?>
+    </div>
+<?php endif; ?>
 </html>
