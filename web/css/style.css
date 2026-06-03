@@ -20,36 +20,30 @@ body {
 main {
   flex: 1;
 }
-
-/* ================= BANNIÈRE / HEADER (LARGEUR TOTALE OPTIMISÉE) ================= */
+/* ================= BANNIÈRE / HEADER (GESTION NATIVE EN CSS) ================= */
 .app-header {
-  position: relative; /* Nécessaire pour placer le sélecteur de mode absolu */
+  position: relative;
   width: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
-
-/* L'image prend toute la largeur disponible et s'étire proprement en hauteur */
-.app-header img {
-  width: 100%;
-  height: 160px; /* Agrandissement vertical */
-  object-fit: cover; /* Remplit l'espace sans écraser ni distordre l'image */
-  display: block;
-}
-
-/* Sélecteur de mode (PC) */
-.mode-switcher {
-  position: absolute;
-  bottom: 15px;
-  right: 20px;
+  height: 160px; /* Hauteur fixe idéale pour vos bannières */
+  background-size: cover;
+  background-position: center;
   display: flex;
-  gap: 4px;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 5px;
-  border-radius: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  z-index: 10;
+  justify-content: flex-end;
+  align-items: flex-end;
+  padding: 15px 25px;
+  transition: background-image 0.3s ease-in-out; /* Effet de fondu fluide entre les modes */
+}
+
+/* Mode Utilisateur : charge la bannière bleue */
+.app-header.user-mode {
+  background-image: url("../img/baniere_bleue.png");
+  background-color: #0c1c3e;
+}
+
+/* Mode Admin : charge la bannière noire */
+.app-header.admin-mode {
+  background-image: url("../img/baniere_noire.png");
+  background-color: #000000;
 }
 
 .btn {

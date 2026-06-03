@@ -16,7 +16,6 @@ function switchMode(mode) {
     const btnAdmin = document.getElementById('btn-mode-admin');
     const appHeader = document.getElementById('app-header');
     const appNavbar = document.getElementById('app-navbar');
-    const bannerImg = document.querySelector('.app-header img');
     const adminElements = document.querySelectorAll('.admin-only');
 
     if (mode === 'admin') {
@@ -24,6 +23,7 @@ function switchMode(mode) {
         if (btnUser) btnUser.classList.remove('active');
         adminElements.forEach(el => el.classList.remove('hidden'));
         
+        // Le changement de classe ici va automatiquement déclencher le changement d'image en CSS
         if (appHeader) {
             appHeader.classList.remove('user-mode');
             appHeader.classList.add('admin-mode');
@@ -31,9 +31,6 @@ function switchMode(mode) {
         if (appNavbar) {
             appNavbar.classList.remove('user-mode-nav');
             appNavbar.classList.add('admin-mode-nav');
-        }
-        if (bannerImg) {
-            bannerImg.src = 'img/baniere_noire.png';
         }
     } else {
         if (btnUser) btnUser.classList.add('active');
@@ -48,12 +45,8 @@ function switchMode(mode) {
             appNavbar.classList.remove('admin-mode-nav');
             appNavbar.classList.add('user-mode-nav');
         }
-        if (bannerImg) {
-            bannerImg.src = 'img/baniere_bleue.png';
-        }
     }
     
-    // Forcer le redimensionnement fluide de la carte si elle est présente
     if (map) {
         setTimeout(() => { map.invalidateSize(); }, 300);
     }
