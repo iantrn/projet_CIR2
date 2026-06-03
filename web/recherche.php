@@ -1,18 +1,18 @@
 <?php 
-// On inclut la connexion à la BDD
+// On inclut la connexion à la BDD pour être prêt à faire des requêtes
 require_once 'config/db.php'; 
 
 $amenageurs = [];
 $prises = [];
 
 try {
-    // 1. Récupérer la liste unique des aménageurs (triée par ordre alphabétique)
-    $stmtAmenageurs = $pdo->query("SELECT DISTINCT amenageur FROM bornes WHERE amenageur IS NOT NULL AND amenageur != '' ORDER BY amenageur ASC");
-    $amenageurs = $stmtAmenageurs->fetchAll(PDO::FETCH_COLUMN);
+    // Récupération des aménageurs depuis la table AMENAGEUR
+    $stmtAmenageurs = $pdo->query("SELECT id_amenageur, nom_amenageur FROM AMENAGEUR ORDER BY nom_amenageur ASC");
+    $amenageurs = $stmtAmenageurs->fetchAll();
 
-    // 2. Récupérer la liste unique des types de prise (triée par ordre alphabétique)
-    $stmtPrises = $pdo->query("SELECT DISTINCT type_prise FROM bornes WHERE type_prise IS NOT NULL AND type_prise != '' ORDER BY type_prise ASC");
-    $prises = $stmtPrises->fetchAll(PDO::FETCH_COLUMN);
+    // Récupération des types de prise depuis la table TYPE_PRISE
+    $stmtPrises = $pdo->query("SELECT id_type, libelle_type FROM TYPE_PRISE ORDER BY libelle_type ASC");
+    $prises = $stmtPrises->fetchAll();
 
 } catch (PDOException $e) {
     $error_msg = "Erreur BDD : " . $e->getMessage();

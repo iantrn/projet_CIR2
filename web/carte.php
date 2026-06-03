@@ -1,15 +1,13 @@
 <?php 
-// On inclut ta connexion à la BDD
+// On inclut la connexion à la BDD pour être prêt à faire des requêtes
 require_once 'config/db.php'; 
 
 $annees = [];
 
 try {
-    // Récupérer la liste unique des années d'installation présentes en BDD (triées de la plus récente à la plus ancienne)
-    // Note : Remplace 'annee' par le vrai nom de ta colonne si elle s'appelle autrement (ex: annee_implantation)
-    $stmtAnnees = $pdo->query("SELECT DISTINCT annee FROM bornes WHERE annee IS NOT NULL AND annee != '' ORDER BY annee DESC");
+    // Récupération dynamique et unique des années d'installation depuis la table BORNE
+    $stmtAnnees = $pdo->query("SELECT DISTINCT annee_installation FROM BORNE WHERE annee_installation IS NOT NULL ORDER BY annee_installation DESC");
     $annees = $stmtAnnees->fetchAll(PDO::FETCH_COLUMN);
-
 } catch (PDOException $e) {
     $error_msg = "Erreur BDD : " . $e->getMessage();
 }

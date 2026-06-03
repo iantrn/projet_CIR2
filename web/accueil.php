@@ -1,5 +1,5 @@
 <?php 
-// On inclut la connexion à la BDD
+// On inclut la connexion à la BDD pour être prêt à faire des requêtes
 require_once 'config/db.php'; 
 
 // Initialisation des variables pour éviter les erreurs d'affichage
@@ -8,28 +8,32 @@ $dept29 = $dept22 = $dept56 = $dept35 = 0;
 $nbAmenageurs = $nbTypesPrise = 0;
 
 try {
-    // 1. Total des enregistrements
-    $total = $pdo->query("SELECT COUNT(*) FROM bornes")->fetchColumn();
+    // 1. Total des bornes
+    $total = $pdo->query("SELECT COUNT(*) FROM BORNE")->fetchColumn();
 
     // 2. Statistiques par année
-    $annee2020 = $pdo->query("SELECT COUNT(*) FROM bornes WHERE annee = 2020")->fetchColumn();
-    $annee2021 = $pdo->query("SELECT COUNT(*) FROM bornes WHERE annee = 2021")->fetchColumn();
-    $annee2022 = $pdo->query("SELECT COUNT(*) FROM bornes WHERE annee = 2022")->fetchColumn();
+    $annee2020 = $pdo->query("SELECT COUNT(*) FROM BORNE WHERE annee_installation = 2020")->fetchColumn();
+    $annee2021 = $pdo->query("SELECT COUNT(*) FROM BORNE WHERE annee_installation = 2021")->fetchColumn();
+    $annee2022 = $pdo->query("SELECT COUNT(*) FROM BORNE WHERE annee_installation = 2022")->fetchColumn();
 
-    // 3. Statistiques par département
-    $dept22 = $pdo->query("SELECT COUNT(*) FROM bornes WHERE departement = '22'")->fetchColumn();
-    $dept29 = $pdo->query("SELECT COUNT(*) FROM bornes WHERE departement = '29'")->fetchColumn();
-    $dept35 = $pdo->query("SELECT COUNT(*) FROM bornes WHERE departement = '35'")->fetchColumn();
-    $dept56 = $pdo->query("SELECT COUNT(*) FROM bornes WHERE departement = '56'")->fetchColumn();
+    // 3. Statistiques par département (Jointures basées sur ton MCD)
+    $baseDeptQuery = "SELECT COUNT(*) FROM BORNE b 
+                      JOIN STATION s ON b.id_station = s.id_station 
+                      JOIN COMMUNE c ON s.code_insee = c.code_insee 
+                      WHERE c.num_departement = ";
+                      
+    $dept22 = $pdo->query($baseDeptQuery . "'22'")->fetchColumn();
+    $dept29 = $pdo->query($baseDeptQuery . "'29'")->fetchColumn();
+    $dept35 = $pdo->query($baseDeptQuery . "'35'")->fetchColumn();
+    $dept56 = $pdo->query($baseDeptQuery . "'56'")->fetchColumn();
 
     // 4. Nombre d'aménageurs uniques
-    $nbAmenageurs = $pdo->query("SELECT COUNT(DISTINCT amenageur) FROM bornes")->fetchColumn();
+    $nbAmenageurs = $pdo->query("SELECT COUNT(*) FROM AMENAGEUR")->fetchColumn();
 
     // 5. Nombre de types de prise uniques
-    $nbTypesPrise = $pdo->query("SELECT COUNT(DISTINCT type_prise) FROM bornes")->fetchColumn();
+    $nbTypesPrise = $pdo->query("SELECT COUNT(*) FROM TYPE_PRISE")->fetchColumn();
 
 } catch (PDOException $e) {
-    // En cas d'erreur de requête, on affiche un message dans la console ou discrètement
     $error_msg = "Erreur BDD : " . $e->getMessage();
 }
 ?>
