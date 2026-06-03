@@ -9,41 +9,43 @@ body {
   margin: 0;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  background-color: #f4f6f7;
 }
 
-html,
-body {
-  height: 100%;
+/* Wrapper pour donner de la flexibilité aux pages d'accueil et recherche */
+.content-wrapper {
+  flex: 1;
 }
 
 main {
   flex: 1;
 }
 
-/* ================= BANNIÈRE / HEADER (PC) ================= */
+/* ================= BANNIÈRE / HEADER (PC OPTIMISÉ) ================= */
 .app-header {
+  position: relative; /* Indispensable pour l'alignement absolu du switcher */
   width: 100%;
-  height: auto; 
-  background: none; 
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
-  padding: 15px 25px;
+  text-align: center;
+  padding: 0;
+  transition: background-color 0.4s ease;
 }
 
+/* Couleurs de fond pour fusionner avec l'image centrée sur grand écran */
 .app-header.user-mode {
-  background: none;
-}
-
-/* Couleurs de fond adaptées pour fusionner avec les bords des bannières sur grand écran */
-.app-header.user-mode {
-  background-image: url("../img/baniere_bleue.png");
   background-color: #0c1c3e;
-  background-size: cover;
 }
 .app-header.admin-mode {
-  background-image: url("../img/baniere_noire.png");
   background-color: #000000;
+}
+
+/* Taille maximale et centrage parfait de l'image de la bannière sans zoom destructeur */
+.app-header img {
+  max-height: 150px;
+  width: auto;
+  max-width: 100%;
+  margin: 0 auto;
+  display: block;
 }
 
 /* Sélecteur de mode (PC) */
@@ -53,13 +55,12 @@ main {
   right: 15px;
   display: flex;
   gap: 4px;
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.4);
   padding: 5px;
   border-radius: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   z-index: 10;
 }
-
 
 .btn {
   padding: 8px 20px;
@@ -121,11 +122,11 @@ main {
   text-decoration: underline;
 }
 
-/* ================= STRUCTURE SPLIT SCREEN (PC) ================= */
+/* ================= STRUCTURE SPLIT SCREEN (PC - PAGE CARTE) ================= */
 .main-container {
   display: flex;
   flex: 1;
-  height: calc(100vh - 150px - 45px); /* Header + Navbar */
+  min-height: calc(100vh - 200px);
 }
 
 .sidebar {
@@ -138,48 +139,12 @@ main {
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.02);
 }
 
-.search-box {
-  display: flex;
-  gap: 8px;
+.formulaire-carte h2 {
+  font-size: 18px;
+  font-weight: 500;
   margin-bottom: 15px;
-}
-.search-box input {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-.list-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  margin-top: 15px;
-}
-.scrollable-list {
-  flex: 1;
-  overflow-y: auto;
-  padding-right: 5px;
-}
-
-.station-card {
-  background: #fdfdfd;
-  padding: 15px;
-  margin-bottom: 12px;
-  border-radius: 6px;
-  border: 1px solid #eaeaea;
-  transition: transform 0.2s;
-}
-.station-card:hover {
-  transform: translateY(-2px);
-  border-color: #3498db;
-}
-.card-buttons {
-  margin-top: 12px;
-  display: flex;
-  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ccc;
 }
 
 .map-container {
@@ -189,6 +154,7 @@ main {
 #map {
   width: 100%;
   height: 100%;
+  min-height: 450px;
 }
 
 /* Boutons secondaires */
@@ -211,70 +177,20 @@ main {
   font-weight: bold;
   margin-bottom: 15px;
 }
-.btn-small {
-  padding: 6px 12px;
-  font-size: 13px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.btn-detail {
-  background: #e0e6ed;
-  color: #3c4858;
-}
-.btn-edit {
-  background: #f1c40f;
-  color: #333;
-  font-weight: bold;
-}
 
 /* Modals (Popups) */
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: flex; justify-content: center; align-items: center;
   z-index: 9999;
 }
 .modal-content {
-  background: white;
-  padding: 25px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 450px;
-  position: relative;
+  background: white; padding: 25px; border-radius: 8px;
+  width: 90%; max-width: 450px; position: relative;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
-.modal-content label {
-  display: block;
-  margin-top: 10px;
-  font-weight: 600;
-  font-size: 14px;
-}
-.modal-content input {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-.close-modal {
-  position: absolute;
-  top: 12px;
-  right: 18px;
-  font-size: 26px;
-  cursor: pointer;
-  color: #aaa;
-}
-.close-modal:hover {
-  color: #000;
-}
-
 .hidden {
   display: none !important;
 }
@@ -284,22 +200,21 @@ main {
    ========================================================================== */
 @media (max-width: 768px) {
   /* 1. Header sur mobile */
-  .app-header {
-    height: 150px;
-    background-size: auto 100%; /* garde la proportion et remplit la hauteur */
-    background-position: center;
-    background-repeat: no-repeat;
+  .app-header img {
+    max-height: 110px;
   }
 
-  /* RETRECISSEMENT DES BOUTONS SUR MOBILE */
+  /* RETRECISSEMENT DU BOUTON SWITCHER ET DE SES ENFANTS SUR MOBILE */
   .mode-switcher {
     padding: 3px;
     gap: 2px;
     border-radius: 20px;
+    bottom: 5px;
+    right: 10px;
   }
   .btn {
     padding: 5px 12px;
-    font-size: 11px; /* Écrit plus petit */
+    font-size: 11px; /* Réduction taille écriture */
     border-radius: 15px;
   }
 
@@ -312,25 +227,20 @@ main {
     font-size: 14px;
   }
 
-  /* 3. On bascule le Split Screen en mode vertical (Top / Bottom) */
+  /* 3. On bascule le Split Screen en vertical sur la page Carte */
   .main-container {
     flex-direction: column;
-    height: calc(100vh - 110px - 41px);
   }
-
-  /* 4. La liste prend la moitié haute de l'écran restant */
   .sidebar {
     width: 100%;
-    height: 50%;
+    height: auto;
     border-right: none;
     border-bottom: 1px solid #e1e8ed;
     padding: 15px;
   }
-
-  /* 5. La carte prend la moitié basse de l'écran restant */
   .map-container {
     width: 100%;
-    height: 50%;
+    height: 400px; /* Fixe la hauteur sur mobile pour éviter de disparaître */
   }
 }
 
@@ -343,15 +253,13 @@ footer {
   width: 100%;
 }
 
-/*Page accueil présentation */
-
+/* Page accueil présentation */
 .presentation {
   text-align: center;
   padding: 30px 20px;
   max-width: 700px;
   margin: 0 auto;
 }
-
 .presentation h2 {
   font-size: 20px;
   font-weight: 500;
@@ -359,7 +267,6 @@ footer {
   padding-bottom: 10px;
   border-bottom: 1px solid #ccc;
 }
-
 .presentation-box {
   border: 1px solid #ccc;
   border-radius: 12px;
@@ -370,15 +277,13 @@ footer {
   color: #333;
 }
 
-/*Page accueil statistiques */
-
+/* Page accueil statistiques */
 .statistiques {
   text-align: center;
   padding: 30px 20px;
   max-width: 700px;
   margin: 0 auto;
 }
-
 .statistiques h2 {
   font-size: 20px;
   font-weight: 500;
@@ -386,7 +291,6 @@ footer {
   padding-bottom: 10px;
   border-bottom: 1px solid #ccc;
 }
-
 .stat-box {
   border: 1px solid #ccc;
   border-radius: 12px;
@@ -396,53 +300,45 @@ footer {
   font-size: 14px;
   color: #333;
 }
-
 .stat-row {
   display: flex;
   align-items: flex-start;
   gap: 10px;
 }
-
 .stat-label {
   font-weight: 500;
   min-width: 180px;
 }
-
 .stat-arrow {
   color: #555;
 }
-
 .stat-value {
   font-weight: 500;
   color: #29b6f6;
 }
-
 .stat-sub {
   display: flex;
   flex-direction: column;
   gap: 4px;
   margin-left: auto;
 }
-
 .stat-subrow {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-
 .stat-dash {
   color: #555;
   white-space: nowrap;
 }
 
-/*page recherche formulaire */
+/* Page recherche formulaire */
 .formulaire {
   text-align: center;
   padding: 30px 20px;
   max-width: 400px;
   margin: 0 auto;
 }
-
 .formulaire h2 {
   font-size: 20px;
   font-weight: 500;
@@ -450,18 +346,15 @@ footer {
   padding-bottom: 10px;
   border-bottom: 1px solid #ccc;
 }
-
 .form-box {
   border: 1px solid #ccc;
   border-radius: 12px;
   padding: 25px 20px;
   text-align: left;
 }
-
 .form-group {
   margin-bottom: 18px;
 }
-
 .form-group label {
   display: block;
   font-size: 14px;
@@ -469,7 +362,6 @@ footer {
   margin-bottom: 6px;
   color: #333;
 }
-
 .form-group select {
   width: 100%;
   padding: 10px 12px;
@@ -480,7 +372,6 @@ footer {
   background-color: white;
   appearance: auto;
 }
-
 .btn-rechercher {
   width: 100%;
   padding: 12px;
@@ -493,9 +384,6 @@ footer {
   cursor: pointer;
   margin-top: 5px;
 }
-
 .btn-rechercher:hover {
   background-color: #333;
 }
-
-/*page carte formulaire */

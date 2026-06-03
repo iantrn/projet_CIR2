@@ -14,10 +14,10 @@ require_once 'config/db.php';
 </head>
 <body>
 <header id="app-header" class="app-header user-mode">
-  <img src="img/baniere_bleue.png" alt="BreizhWatt" style="width:100%; display:block;">
+  <img src="img/baniere_bleue.png" id="app-banner-img" alt="BreizhWatt">
   <div class="mode-switcher">
-    <button class="btn active">Utilisateur</button>
-    <button class="btn">Admin</button>
+    <button id="btn-mode-user" class="btn active">Utilisateur</button>
+    <button id="btn-mode-admin" class="btn">Admin</button>
   </div>
 </header>
 
@@ -27,37 +27,47 @@ require_once 'config/db.php';
     <a href="carte.php" class="nav-btn">Carte</a>
 </nav>
 
-<div class="formulaire">
-  <div class="form-box">
+<main class="main-container">
+    <section class="sidebar">
+        <div class="formulaire-carte">
+          <h2>Filtrer la carte</h2>
+          <div class="form-box">
+            <div class="form-group">
+              <label for="annee">Année d'installation</label>
+              <select id="annee" name="annee">
+                <option value="">-- Sélectionner --</option>
+                <option value="2020">2020</option>
+                <option value="2021">2021</option>
+                <option value="2022">2022</option>
+              </select>
+            </div>
+        
+            <div class="form-group">
+              <label for="departement">Département</label>
+              <select id="departement" name="departement">
+                <option value="">-- Sélectionner --</option>
+                <option value="22">Côtes-d'Armor (22)</option>
+                <option value="29">Finistère (29)</option>
+                <option value="35">Ille-et-Vilaine (35)</option>
+                <option value="56">Morbihan (56)</option>
+              </select>
+            </div>
+        
+            <button type="button" class="btn-rechercher">Filtrer les bornes</button>
+          </div>
+        </div>
+    </section>
 
-    <div class="form-group">
-      <label for="annee">Année d'installation</label>
-      <select id="annee" name="annee">
-        <option value="">-- Sélectionner --</option>
-      </select>
-    </div>
+    <section class="map-container">
+        <div id="map"></div>
+    </section>
+</main>
 
-    <div class="form-group">
-      <label for="departement">Département</label>
-      <select id="departement" name="departement">
-        <option value="">-- Sélectionner --</option>
-        <option value="22">Côtes-d'Armor (22)</option>
-        <option value="29">Finistère (29)</option>
-        <option value="35">Ille-et-Vilaine (35)</option>
-        <option value="56">Morbihan (56)</option>
-      </select>
-    </div>
-
-    <button type="button" class="btn-rechercher">Rechercher</button>
-
-  </div>
-</div>
-
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="js/main.js"></script>
 <footer>
   <p>© 2026 - CIR2 Gabriel T, Ian T</p>
 </footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>
