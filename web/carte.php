@@ -19,7 +19,6 @@ require_once 'config/db.php';
     <button id="btn-mode-admin" class="btn">Admin</button>
   </div>
 </header>
-
 <nav id="app-navbar" class="app-navbar user-mode-nav">
     <a href="accueil.php" class="nav-btn">Accueil</a>
     <a href="recherche.php" class="nav-btn">Recherche</a>

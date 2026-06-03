@@ -20,18 +20,18 @@ body {
 main {
   flex: 1;
 }
-/* ================= BANNIÈRE / HEADER (GESTION NATIVE EN CSS) ================= */
+/* ================= BANNIÈRE / HEADER (PC) ================= */
 .app-header {
-  position: relative;
+  position: relative;     /* Crucial pour caler les boutons absolus à l'intérieur */
   width: 100%;
-  height: 160px; /* Hauteur fixe idéale pour vos bannières */
-  background-size: cover;
-  background-position: center;
+  height: 165px;          /* Force une vraie hauteur pour afficher l'image de fond */
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
   padding: 15px 25px;
-  transition: background-image 0.3s ease-in-out; /* Effet de fondu fluide entre les modes */
+  background-size: cover;     /* Force l'image à recouvrir tout l'espace proprement */
+  background-position: center; /* Centre l'image de la bannière */
+  transition: background-image 0.2s ease-in-out; /* Transition fluide lors du clic */
 }
 
 /* Mode Utilisateur : charge la bannière bleue */
@@ -45,7 +45,6 @@ main {
   background-image: url("../img/baniere_noire.png");
   background-color: #000000;
 }
-
 .btn {
   padding: 8px 20px;
   border: none;
