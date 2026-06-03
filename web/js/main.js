@@ -20,14 +20,11 @@ if (mapContainer) {
     loadMapMarkers('', '');
 }
 
-// =========================================================================
-// Fonction AJAX principale : va chercher les données en PHP et dessine les marqueurs
-// =========================================================================
+// Fonction AJAX principale pour la carte : va chercher les données en PHP et dessine les marqueurs
 function loadMapMarkers(annee, departement) {
-    // Appel asynchrone à notre API PHP avec les paramètres de filtrage
     fetch(`api/get_stations.php?annee=${annee}&departement=${departement}`)
         .then(response => {
-            if (!response.ok) throw new Error("Erreur lors de la récupération des données");
+            if (!response.ok) throw new Error("Erreur lors de la récupération des données de la carte");
             return response.json();
         })
         .then(stations => {
@@ -84,7 +81,7 @@ function switchMode(mode) {
     }
 }
 
-// Écouteurs pour la bascule de mode
+// Écouteurs pour la bascule de mode au chargement du DOM
 document.addEventListener('DOMContentLoaded', () => {
     const btnUser = document.getElementById('btn-mode-user');
     const btnAdmin = document.getElementById('btn-mode-admin');
@@ -97,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // =========================================================================
-// 3. Gestion des Modales et Actions de formulaires
+// 3. Gestion des Modales et du filtrage de la carte
 // =========================================================================
 document.addEventListener('DOMContentLoaded', () => {
     // Fermeture des modales
@@ -120,35 +117,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // INTERCEPTION DU CLIC FILTRER SUR LA CARTE
+    // Interception du clic Filtrer sur l'onglet carte.php
     const btnFilterMap = document.querySelector('.formulaire-carte .btn-rechercher');
     if (btnFilterMap) {
         btnFilterMap.addEventListener('click', () => {
-            // On récupère les valeurs choisies par l'utilisateur
             const anneeSelectionnee = document.getElementById('annee').value;
             const departementSelectionne = document.getElementById('departement').value;
-            
-            // On relance le chargement des marqueurs avec les filtres requis !
             loadMapMarkers(anneeSelectionnee, departementSelectionne);
         });
     }
-    // =========================================================================
-// 4. Gestion de la Recherche Dynamique (Page recherche.php)
+});
+
+// =========================================================================
+// 4. Gestion de la Recherche Dynamique avec Tableau (Page recherche.php)
 // =========================================================================
 document.addEventListener('DOMContentLoaded', () => {
     const btnSearchPage = document.getElementById('btn-search');
     
-    if (btnSearchPage && document.getElementById('search-table-body')) {
+    if (btnSearchPage) {
         btnSearchPage.addEventListener('click', () => {
             // Récupération des valeurs sélectionnées dans les listes déroulantes
             const amenageur = document.getElementById('amenageur').value;
             const typePrise = document.getElementById('type_prise').value;
             const departement = document.getElementById('departement').value;
 
-            // Appel AJAX à notre API de recherche
+            // Appel AJAX à notre API de recherche sécurisée
             fetch(`api/search_stations.php?amenageur=${amenageur}&type_prise=${typePrise}&departement=${departement}`)
                 .then(response => {
-                    if (!response.ok) throw new Error("Erreur de recherche");
+                    if (!response.ok) throw new Error("Erreur serveur lors de la recherche");
                     return response.json();
                 })
                 .then(data => {
@@ -156,26 +152,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     const tbody = document.getElementById('search-table-body');
                     const countSpan = document.getElementById('results-count');
 
+                    if (!container || !tbody) return;
+
                     // On vide le tableau précédent
                     tbody.innerHTML = '';
-                    countSpan.textContent = data.length;
+                    
+                    if (countSpan) {
+                        countSpan.textContent = data.length;
+                    }
 
                     if (data.length === 0) {
                         tbody.innerHTML = `<tr><td colspan="4" style="padding: 15px; text-align: center; color: #777;">Aucune borne ne correspond à ces critères.</td></tr>`;
                     } else {
-                        // On boucle sur les lignes trouvées pour construire le tableau
+                        // On boucle sur les lignes trouvées pour construire dynamiquement le tableau
                         data.forEach(station => {
                             const tr = document.createElement('tr');
                             tr.style.borderBottom = "1px solid #eee";
                             
-                            // Détection du mode actuel (admin ou user) pour afficher/masquer le bouton modifier
+                            // Détection dynamique du mode actuel (admin ou user) pour afficher l'Action
                             const currentMode = localStorage.getItem('breizhwatt-mode') || 'user';
                             const adminClass = (currentMode === 'admin') ? '' : 'hidden';
 
                             tr.innerHTML = `
-                                <td style="padding: 12px; font-weight: bold; color: #333;">${station.nom_station}</td>
+                                <td style="padding: 12px; font-weight: bold; color: #333;">${station.nom_station || 'Sans nom'}</td>
                                 <td style="padding: 12px; color: #555;">${station.nom_amenageur_operateur || 'Inconnu'}</td>
-                                <td style="padding: 12px; font-size: 13px; color: #666;"><strong>${station.nom_commune}</strong><br>${station.adresse_station}</td>
+                                <td style="padding: 12px; font-size: 13px; color: #666;"><strong>${station.nom_commune || ''}</strong><br>${station.adresse_station || ''}</td>
                                 <td style="padding: 12px;" class="admin-only ${adminClass}">
                                     <button class="btn-edit-station-trigger" data-id="${station.id_station_interne}" style="background-color: #29b6f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">✏️ Modifier</button>
                                 </td>
@@ -184,11 +185,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     }
 
-                    // On affiche enfin le bloc de résultats
+                    // Affichage explicite du container de résultats (retrait de la classe et force display)
                     container.classList.remove('hidden');
+                    container.style.display = "block";
                 })
-                .catch(error => console.error("Erreur lors de la recherche :", error));
+                .catch(error => {
+                    alert("Erreur lors de la recherche : " + error.message);
+                    console.error(error);
+                });
         });
     }
-});
 });
