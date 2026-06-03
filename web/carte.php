@@ -1,6 +1,18 @@
 <?php 
-// On inclut la connexion à la BDD pour être prêt à faire des requêtes
+// On inclut ta connexion à la BDD
 require_once 'config/db.php'; 
+
+$annees = [];
+
+try {
+    // Récupérer la liste unique des années d'installation présentes en BDD (triées de la plus récente à la plus ancienne)
+    // Note : Remplace 'annee' par le vrai nom de ta colonne si elle s'appelle autrement (ex: annee_implantation)
+    $stmtAnnees = $pdo->query("SELECT DISTINCT annee FROM bornes WHERE annee IS NOT NULL AND annee != '' ORDER BY annee DESC");
+    $annees = $stmtAnnees->fetchAll(PDO::FETCH_COLUMN);
+
+} catch (PDOException $e) {
+    $error_msg = "Erreur BDD : " . $e->getMessage();
+}
 ?>
 
 <!DOCTYPE html>
@@ -25,8 +37,7 @@ require_once 'config/db.php';
     <a href="carte.php" class="nav-btn">Carte</a>
 </nav>
 
-<!-- Rétablissement du split-screen adaptatif avec la carte Leaflet intégrée -->
-<main class="main-container">
+<main class=\"main-container\">
     <section class="sidebar">
         <div class="formulaire-carte">
           <h2>Filtrer la carte</h2>
@@ -35,9 +46,9 @@ require_once 'config/db.php';
               <label for="annee">Année d'installation</label>
               <select id="annee" name="annee">
                 <option value="">-- Sélectionner --</option>
-                <option value="2020">2020</option>
-                <option value="2021">2021</option>
-                <option value="2022">2022</option>
+                <?php foreach ($annees as $annee): ?>
+                    <option value="<?= htmlspecialchars($annee) ?>"><?= htmlspecialchars($annee) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
         
@@ -55,7 +66,6 @@ require_once 'config/db.php';
             <button type="button" class="btn-rechercher">Filtrer les bornes</button>
           </div>
           
-          <!-- Ce bouton d'administration apparaîtra uniquement en Mode Admin -->
           <button id="btn-add-station" class="btn-success admin-only hidden" style="margin-top: 15px;">+ Ajouter une Borne</button>
         </div>
     </section>
@@ -70,6 +80,6 @@ require_once 'config/db.php';
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="js/main.js?v=1"></script>  <!-- On empeche le naviagateur d'utiliser une version en cache -->
+<script src="js/main.js"></script>
 </body>
 </html>
