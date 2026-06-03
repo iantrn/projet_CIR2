@@ -8,7 +8,7 @@ require_once 'config/db.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BreizhWatt - Bornes de Recharge IRVE</title>
+    <title>BreizhWatt</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -127,6 +127,6 @@ require_once 'config/db.php';
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="js/main.js"></script>
+<script src="js/main.js?v=1"></script> <!-- On empeche le naviagateur d'utiliser une version en cache -->
 </body>
 </html>
