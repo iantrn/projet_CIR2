@@ -1,29 +1,34 @@
-// 1. Initialisation sécurisée de la carte Leaflet (uniquement si l'élément existe sur la page actuelle)
+// =========================================================================
+// 1. Initialisation sécurisée de la carte Leaflet (uniquement si #map existe)
+// =========================================================================
 let map;
 const mapContainer = document.getElementById('map');
 
 if (mapContainer) {
     map = L.map('map').setView([48.202047, -2.932644], 8); 
 
+    // Chargement des tuiles de la carte OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 }
 
-// 2. Gestion globale et persistante de la bascule Mode Utilisateur / Mode Admin
-function switchMode(mode) {
-    const btnUser = document.getElementById('btn-mode-user');
-    const btnAdmin = document.getElementById('btn-mode-admin');
-    const appHeader = document.getElementById('app-header');
-    const appNavbar = document.getElementById('app-navbar');
-    const adminElements = document.querySelectorAll('.admin-only');
+// =========================================================================
+// 2. Gestion de la bascule Mode Utilisateur / Mode Admin
+// =========================================================================
+const btnUser = document.getElementById('btn-mode-user');
+const btnAdmin = document.getElementById('btn-mode-admin');
+const adminElements = document.querySelectorAll('.admin-only');
+const appHeader = document.getElementById('app-header');
+const appNavbar = document.getElementById('app-navbar');
 
+function switchMode(mode) {
     if (mode === 'admin') {
         if (btnAdmin) btnAdmin.classList.add('active');
         if (btnUser) btnUser.classList.remove('active');
         adminElements.forEach(el => el.classList.remove('hidden'));
         
-        // Le changement de classe ici va automatiquement déclencher le changement d'image en CSS
+        // Changement vers la bannière et la navbar admin (noires)
         if (appHeader) {
             appHeader.classList.remove('user-mode');
             appHeader.classList.add('admin-mode');
@@ -37,6 +42,7 @@ function switchMode(mode) {
         if (btnAdmin) btnAdmin.classList.remove('active');
         adminElements.forEach(el => el.classList.add('hidden'));
         
+        // Changement vers la bannière et la navbar utilisateur (bleues)
         if (appHeader) {
             appHeader.classList.remove('admin-mode');
             appHeader.classList.add('user-mode');
@@ -47,46 +53,81 @@ function switchMode(mode) {
         }
     }
     
+    // Forcer Leaflet à recalculer sa taille si la carte est présente
     if (map) {
         setTimeout(() => { map.invalidateSize(); }, 300);
     }
 }
 
-// Écouteurs d'événements sécurisés pour le clic sur les boutons de mode
-const btnUser = document.getElementById('btn-mode-user');
-const btnAdmin = document.getElementById('btn-mode-admin');
-
+// Ajout sécurisé des écouteurs sur les boutons de mode
 if (btnUser) {
-    btnUser.addEventListener('click', () => {
-        localStorage.setItem('breizhwatt-mode', 'user');
-        switchMode('user');
-    });
+    btnUser.addEventListener('click', () => switchMode('user'));
 }
-
 if (btnAdmin) {
-    btnAdmin.addEventListener('click', () => {
-        localStorage.setItem('breizhwatt-mode', 'admin');
-        switchMode('admin');
-    });
+    btnAdmin.addEventListener('click', () => switchMode('admin'));
 }
 
-// RESTAURATION AUTOMATIQUE : Vérifie et applique le dernier mode enregistré au chargement de chaque page
-const savedMode = localStorage.getItem('breizhwatt-mode') || 'user';
-switchMode(savedMode);
+// =========================================================================
+// 3. Gestion des fenêtres Modales (Popups) et Actions Spécifiques
+// =========================================================================
+const modalDetail = document.getElementById('modal-detail');
+const modalAdd = document.getElementById('modal-add');
+const modalEdit = document.getElementById('modal-edit');
 
+// Fermer toutes les fenêtres au clic sur la croix "X"
+document.querySelectorAll('.close-modal').forEach(cross => {
+    cross.addEventListener('click', () => {
+        if (modalDetail) modalDetail.classList.add('hidden');
+        if (modalAdd) modalAdd.classList.add('hidden');
+        if (modalEdit) modalEdit.classList.add('hidden');
+    });
+});
 
-// 3. Gestion sécurisée des fenêtres Modales / Boutons d'ajout (Si présents sur la page)
+// Ouvrir le formulaire d'ajout (Bouton Admin)
 const btnAddStation = document.getElementById('btn-add-station');
 if (btnAddStation) {
     btnAddStation.addEventListener('click', () => {
-        const modalAdd = document.getElementById('modal-add');
         if (modalAdd) modalAdd.classList.remove('hidden');
     });
 }
 
+// Écouteur global sur la liste (si présente)
+const stationsList = document.getElementById('stations-list');
+if (stationsList) {
+    stationsList.addEventListener('click', (e) => {
+        // Clic sur bouton "Détail"
+        if (e.target.classList.contains('btn-detail') && modalDetail) {
+            document.getElementById('detail-title').innerText = "Electric 50 Charg";
+            document.getElementById('detail-body').innerHTML = `
+                <p style="margin-bottom:8px;"><strong>📍 Adresse :</strong> 4 Rue de l'Énergie, Rennes</p>
+                <p style="margin-bottom:8px;"><strong>🔌 Prises dispo :</strong> Type 2, Combo CCS</p>
+                <p style="margin-bottom:8px;"><strong>⚡ Puissance max :</strong> 50 kW</p>
+                <p style="margin-bottom:8px;"><strong>💶 Tarification :</strong> 0.45€ / kWh</p>
+            `;
+            modalDetail.classList.remove('hidden');
+        }
+        
+        // Clic sur bouton "Modifier" (Visible uniquement en Admin)
+        if (e.target.classList.contains('btn-edit') && modalEdit) {
+            document.getElementById('edit-station-id').value = "123"; 
+            document.getElementById('edit-nom').value = "Electric 50 Charg";
+            document.getElementById('edit-tarif').value = "0.45€ / kWh";
+            modalEdit.classList.remove('hidden');
+        }
+    });
+}
+
+// Écouteur du bouton Rechercher (S'adapte à #btn-search ou .btn-rechercher)
 const btnSearch = document.getElementById('btn-search') || document.querySelector('.btn-rechercher');
 if (btnSearch) {
     btnSearch.addEventListener('click', () => {
-        alert("Action de filtrage déclenchée !\n(La liaison SQL via requêtes PHP/AJAX arrive à l'étape suivante !)");
+        const inputSearch = document.getElementById('search-input');
+        const inputVal = inputSearch ? inputSearch.value : "";
+        
+        if (inputVal.trim() !== "") {
+            alert("Recherche de : " + inputVal + "\n(Bientôt relié aux données de la BDD via AJAX !)");
+        } else {
+            alert("Filtrage ou recherche déclenchée !");
+        }
     });
 }
