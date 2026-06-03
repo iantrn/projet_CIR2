@@ -1,4 +1,4 @@
-// 1. Initialisation sécurisée de la carte Leaflet (uniquement si l'élément existe sur la page)
+// 1. Initialisation sécurisée de la carte Leaflet (uniquement si l'élément existe sur la page actuelle)
 let map;
 const mapContainer = document.getElementById('map');
 
@@ -16,7 +16,7 @@ function switchMode(mode) {
     const btnAdmin = document.getElementById('btn-mode-admin');
     const appHeader = document.getElementById('app-header');
     const appNavbar = document.getElementById('app-navbar');
-    const bannerImg = document.getElementById('app-banner-img');
+    const bannerImg = document.querySelector('.app-header img');
     const adminElements = document.querySelectorAll('.admin-only');
 
     if (mode === 'admin') {
@@ -53,13 +53,13 @@ function switchMode(mode) {
         }
     }
     
-    // Recalculer la taille de Leaflet si la carte existe
+    // Forcer le redimensionnement fluide de la carte si elle est présente
     if (map) {
         setTimeout(() => { map.invalidateSize(); }, 300);
     }
 }
 
-// Écouteurs de clics avec persistance via localStorage
+// Écouteurs d'événements sécurisés pour le clic sur les boutons de mode
 const btnUser = document.getElementById('btn-mode-user');
 const btnAdmin = document.getElementById('btn-mode-admin');
 
@@ -77,23 +77,12 @@ if (btnAdmin) {
     });
 }
 
-// Au chargement de chaque page, restaurer automatiquement le dernier mode choisi
+// RESTAURATION AUTOMATIQUE : Vérifie et applique le dernier mode enregistré au chargement de chaque page
 const savedMode = localStorage.getItem('breizhwatt-mode') || 'user';
 switchMode(savedMode);
 
 
-// 3. Gestion sécurisée des fenêtres Modales (si présentes)
-document.querySelectorAll('.close-modal').forEach(cross => {
-    cross.addEventListener('click', () => {
-        const modalDetail = document.getElementById('modal-detail');
-        const modalAdd = document.getElementById('modal-add');
-        const modalEdit = document.getElementById('modal-edit');
-        if (modalDetail) modalDetail.classList.add('hidden');
-        if (modalAdd) modalAdd.classList.add('hidden');
-        if (modalEdit) modalEdit.classList.add('hidden');
-    });
-});
-
+// 3. Gestion sécurisée des fenêtres Modales / Boutons d'ajout (Si présents sur la page)
 const btnAddStation = document.getElementById('btn-add-station');
 if (btnAddStation) {
     btnAddStation.addEventListener('click', () => {
@@ -102,37 +91,9 @@ if (btnAddStation) {
     });
 }
 
-const stationsList = document.getElementById('stations-list');
-if (stationsList) {
-    stationsList.addEventListener('click', (e) => {
-        if (e.target.classList.contains('btn-detail')) {
-            const modalDetail = document.getElementById('modal-detail');
-            document.getElementById('detail-title').innerText = "Electric 50 Charg";
-            document.getElementById('detail-body').innerHTML = `
-                <p style="margin-bottom:8px;"><strong>📍 Adresse :</strong> 4 Rue de l'Énergie, Rennes</p>
-                <p style="margin-bottom:8px;"><strong>🔌 Prises dispo :</strong> Type 2, Combo CCS</p>
-                <p style="margin-bottom:8px;"><strong>⚡ Puissance max :</strong> 50 kW</p>
-                <p style="margin-bottom:8px;"><strong>💶 Tarification :</strong> 0.45€ / kWh</p>
-            `;
-            if (modalDetail) modalDetail.classList.remove('hidden');
-        }
-        
-        if (e.target.classList.contains('btn-edit')) {
-            const modalEdit = document.getElementById('modal-edit');
-            document.getElementById('edit-station-id').value = "123"; 
-            document.getElementById('edit-nom').value = "Electric 50 Charg";
-            document.getElementById('edit-tarif').value = "0.45€ / kWh";
-            if (modalEdit) modalEdit.classList.remove('hidden');
-        }
-    });
-}
-
-// Gestion unifiée pour tous les boutons de recherche/filtrage du site
 const btnSearch = document.getElementById('btn-search') || document.querySelector('.btn-rechercher');
 if (btnSearch) {
     btnSearch.addEventListener('click', () => {
-        const searchInput = document.getElementById('search-input');
-        const inputVal = searchInput ? searchInput.value : '';
-        alert("Action de recherche détectée !\n(Bientôt relié dynamiquement aux données SQL via AJAX !)");
+        alert("Action de filtrage déclenchée !\n(La liaison SQL via requêtes PHP/AJAX arrive à l'étape suivante !)");
     });
 }

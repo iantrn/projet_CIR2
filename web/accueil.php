@@ -14,7 +14,8 @@ require_once 'config/db.php';
 </head>
 <body>
 <header id="app-header" class="app-header user-mode">
-  <img src="img/baniere_bleue.png" id="app-banner-img" alt="BreizhWatt">
+  <img src="img/baniere_bleue.png" alt="BreizhWatt">
+  <!-- Les ID ont été rétablis sur les boutons pour permettre le clic en JS -->
   <div class="mode-switcher">
     <button id="btn-mode-user" class="btn active">Utilisateur</button>
     <button id="btn-mode-admin" class="btn">Admin</button>
@@ -48,6 +49,7 @@ require_once 'config/db.php';
     <div class="statistiques">
       <h2>Statistiques</h2>
 
+      <!-- Total enregistrements -->
       <div class="stat-box">
         <div class="stat-row">
           <span class="stat-label">Nombre d'enregistrements</span>
@@ -56,6 +58,7 @@ require_once 'config/db.php';
         </div>
       </div>
 
+      <!-- Par année -->
       <div class="stat-box">
         <div class="stat-row">
           <span class="stat-label">Nombre de points</span>
@@ -76,6 +79,7 @@ require_once 'config/db.php';
         </div>
       </div>
 
+      <!-- Par département -->
       <div class="stat-box">
         <div class="stat-row">
           <span class="stat-label">Nombre de points</span>
@@ -100,6 +104,7 @@ require_once 'config/db.php';
         </div>
       </div>
 
+      <!-- Nombre d'aménageurs -->
       <div class="stat-box">
         <div class="stat-row">
           <span class="stat-label">Nombre d'aménageurs</span>
@@ -108,6 +113,7 @@ require_once 'config/db.php';
         </div>
       </div>
 
+      <!-- Nombre de types de prise -->
       <div class="stat-box">
         <div class="stat-row">
           <span class="stat-label">Nombre de type de prise</span>

@@ -14,7 +14,7 @@ require_once 'config/db.php';
 </head>
 <body>
 <header id="app-header" class="app-header user-mode">
-  <img src="img/baniere_bleue.png" id="app-banner-img" alt="BreizhWatt">
+  <img src="img/baniere_bleue.png" alt="BreizhWatt">
   <div class="mode-switcher">
     <button id="btn-mode-user" class="btn active">Utilisateur</button>
     <button id="btn-mode-admin" class="btn">Admin</button>
@@ -27,6 +27,7 @@ require_once 'config/db.php';
     <a href="carte.php" class="nav-btn">Carte</a>
 </nav>
 
+<!-- Rétablissement du split-screen adaptatif avec la carte Leaflet intégrée -->
 <main class="main-container">
     <section class="sidebar">
         <div class="formulaire-carte">
@@ -55,6 +56,9 @@ require_once 'config/db.php';
         
             <button type="button" class="btn-rechercher">Filtrer les bornes</button>
           </div>
+          
+          <!-- Ce bouton d'administration apparaîtra uniquement en Mode Admin -->
+          <button id="btn-add-station" class="btn-success admin-only hidden" style="margin-top: 15px;">+ Ajouter une Borne</button>
         </div>
     </section>
 
