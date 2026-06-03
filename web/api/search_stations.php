@@ -25,8 +25,7 @@ try {
         $params['amenageur'] = $amenageur;
     }
 
-    // Filtre Type de prise (Puisque ce sont des colonnes booléennes 0/1 dans la table)
-    // Exemple : si $type_prise vaut 'prise_t2', on valide "WHERE p.prise_t2 = 1"
+    // CORRECTION ICI : On vérifie d'abord que $type_prise N'EST PAS vide avant de filtrer
     $allowed_prises = ['prise_ef', 'prise_t2', 'prise_combo_ccs', 'prise_chademo', 'prise_autre'];
     if (!empty($type_prise) && in_array($type_prise, $allowed_prises)) {
         $sql .= " AND p.$type_prise = 1";
@@ -38,7 +37,7 @@ try {
         $params['departement'] = $departement;
     }
 
-    // Sécurité de performance : on limite l'affichage à 200 lignes pour le tableau
+    // Sécurité de performance : on limite l'affichage aux 200 premières lignes pour le tableau
     $sql .= " LIMIT 200";
 
     $stmt = $pdo->prepare($sql);
