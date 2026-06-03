@@ -1,43 +1,18 @@
-<?php 
-// On inclut la connexion à la BDD pour être prêt à faire des requêtes
-require_once 'config/db.php'; 
-$tables = $pdo->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
-echo "<pre>--- VOS TABLES EN BDD --- \n"; print_r($tables); echo "</pre>"; die();
+<?php
+require_once 'config/db.php';
 
-// Initialisation des variables pour éviter les erreurs d'affichage
-$total = $annee2020 = $annee2021 = $annee2022 = 0;
-$dept29 = $dept22 = $dept56 = $dept35 = 0;
-$nbAmenageurs = $nbTypesPrise = 0;
-
-try {
-    // 1. Total des bornes
-    $total = $pdo->query("SELECT COUNT(*) FROM BORNE")->fetchColumn();
-
-    // 2. Statistiques par année
-    $annee2020 = $pdo->query("SELECT COUNT(*) FROM BORNE WHERE annee_installation = 2020")->fetchColumn();
-    $annee2021 = $pdo->query("SELECT COUNT(*) FROM BORNE WHERE annee_installation = 2021")->fetchColumn();
-    $annee2022 = $pdo->query("SELECT COUNT(*) FROM BORNE WHERE annee_installation = 2022")->fetchColumn();
-
-    // 3. Statistiques par département (Jointures basées sur ton MCD)
-    $baseDeptQuery = "SELECT COUNT(*) FROM BORNE b 
-                      JOIN STATION s ON b.id_station = s.id_station 
-                      JOIN COMMUNE c ON s.code_insee = c.code_insee 
-                      WHERE c.num_departement = ";
-                      
-    $dept22 = $pdo->query($baseDeptQuery . "'22'")->fetchColumn();
-    $dept29 = $pdo->query($baseDeptQuery . "'29'")->fetchColumn();
-    $dept35 = $pdo->query($baseDeptQuery . "'35'")->fetchColumn();
-    $dept56 = $pdo->query($baseDeptQuery . "'56'")->fetchColumn();
-
-    // 4. Nombre d'aménageurs uniques
-    $nbAmenageurs = $pdo->query("SELECT COUNT(*) FROM AMENAGEUR")->fetchColumn();
-
-    // 5. Nombre de types de prise uniques
-    $nbTypesPrise = $pdo->query("SELECT COUNT(*) FROM TYPE_PRISE")->fetchColumn();
-
-} catch (PDOException $e) {
-    $error_msg = "Erreur BDD : " . $e->getMessage();
+$tables_to_check = ['point_de_recharge', 'station', 'commune', 'amenageur_operateur', 'departement'];
+echo "<pre>--- COLONNES DE VOS TABLES --- \n";
+foreach ($tables_to_check as $table) {
+    try {
+        $cols = $pdo->query("DESCRIBE `$table`")->fetchAll(PDO::FETCH_COLUMN);
+        echo "\n📍 Table $table :\n" . implode(", ", $cols) . "\n";
+    } catch (Exception $e) {
+        echo "\n❌ Impossible de lire la table $table : " . $e->getMessage() . "\n";
+    }
 }
+echo "</pre>";
+die();
 ?>
 
 <!DOCTYPE html>
