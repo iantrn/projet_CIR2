@@ -1,6 +1,8 @@
 <?php 
 // On inclut la connexion à la BDD pour être prêt à faire des requêtes
 require_once 'config/db.php'; 
+$tables = $pdo->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
+echo "<pre>--- VOS TABLES EN BDD --- \n"; print_r($tables); echo "</pre>"; die();
 
 // Initialisation des variables pour éviter les erreurs d'affichage
 $total = $annee2020 = $annee2021 = $annee2022 = 0;
