@@ -11,11 +11,14 @@ try {
     $departement = isset($_GET['departement']) ? $_GET['departement'] : '';
 
     // Requête de base pour récupérer l'emplacement des stations uniques
-    $sql = "SELECT DISTINCT s.id_station_interne, s.nom_station, s.adresse_station, s.latitude, s.longitude 
-            FROM station s
-            JOIN point_de_recharge p ON s.id_station_interne = p.id_station_interne
-            JOIN commune c ON s.code_insee = c.code_insee
-            WHERE s.latitude IS NOT NULL AND s.longitude IS NOT NULL";
+    // Modifie la requête SQL dans api/get_stations.php :
+    $sql = "SELECT DISTINCT s.id_station_interne, s.nom_station, s.adresse_station, s.latitude, s.longitude, 
+                        a.nom_amenageur_operateur, c.nom_commune
+        FROM station s
+        JOIN point_de_recharge p ON s.id_station_interne = p.id_station_interne
+        JOIN commune c ON s.code_insee = c.code_insee
+        LEFT JOIN amenageur_operateur a ON p.id_amenageur = a.id_amenageur
+        WHERE s.latitude IS NOT NULL AND s.longitude IS NOT NULL";
 
     $params = [];
 

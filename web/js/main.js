@@ -23,37 +23,35 @@ if (mapContainer) {
 // Fonction AJAX principale pour la carte : va chercher les données en PHP et dessine les marqueurs
 function loadMapMarkers(annee, departement) {
     fetch(`api/get_stations.php?annee=${annee}&departement=${departement}`)
-        .then(response => {
-            if (!response.ok) throw new Error("Erreur lors de la récupération des données de la carte");
-            return response.json();
-        })
+        .then(response => response.json())
         .then(stations => {
-            // Étape essentielle : on vide les anciens marqueurs présents sur la carte
             markersGroup.clearLayers();
 
-            // On boucle sur chaque station reçue de la BDD
             stations.forEach(station => {
                 const lat = parseFloat(station.latitude);
                 const lng = parseFloat(station.longitude);
 
                 if (!isNaN(lat) && !isNaN(lng)) {
-                    // Création du marqueur Leaflet
                     const marker = L.marker([lat, lng]);
 
-                    // Ajout d'une bulle d'info (Popup) au clic sur le marqueur
+                    // Ici on enrichit la popup avec plus de détails
                     marker.bindPopup(`
-                        <div style="font-family: sans-serif;">
-                            <strong style="color: #0c1c3e;">${station.nom_station}</strong><br>
-                            <span style="color: #555; font-size: 12px;">📍 ${station.adresse_station}</span>
+                        <div style="font-family: sans-serif; min-width: 200px;">
+                            <strong style="color: #0c1c3e; font-size: 14px;">${station.nom_station}</strong><br>
+                            <hr style="margin: 5px 0;">
+                            <p style="margin: 2px 0; font-size: 12px;">
+                                📍 <b>Adresse :</b> ${station.adresse_station}<br>
+                                ⚡ <b>Aménageur :</b> ${station.nom_amenageur_operateur || 'Non spécifié'}<br>
+                                🔌 <b>Localisation :</b> ${station.nom_commune || 'Bretagne'}
+                            </p>
                         </div>
                     `);
 
-                    // On ajoute le marqueur dans notre groupe global
                     markersGroup.addLayer(marker);
                 }
             });
         })
-        .catch(error => console.error("Erreur de chargement de la carte :", error));
+        .catch(error => console.error("Erreur :", error));
 }
 
 // =========================================================================
