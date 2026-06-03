@@ -14,12 +14,17 @@ require_once 'config/db.php';
 </head>
 <body>
 <header id="app-header" class="app-header user-mode">
+  <img src="img/baniere_bleue.png" alt="BreizhWatt" style="width:100%; display:block;">
+  <div class="mode-switcher">
+    <button class="btn active">Utilisateur</button>
+    <button class="btn">Admin</button>
+  </div>
 </header>
 
- <nav id="app-navbar" class="app-navbar user-mode-nav">
-        <button class="nav-btn">Accueil</button>
-        <button class="nav-btn">Recherche</button>
-        <button class="nav-btn">Carte</button>
+<nav id="app-navbar" class="app-navbar user-mode-nav">
+    <a href="accueil.php" class="nav-btn">Accueil</a>
+    <a href="recherche.php" class="nav-btn">Recherche</a>
+    <a href="carte.php" class="nav-btn">Carte</a>
 </nav>
 <div class="presentation">
   <h2>Présentation</h2>

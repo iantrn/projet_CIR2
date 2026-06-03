@@ -22,24 +22,24 @@ main {
 
 /* ================= BANNIÈRE / HEADER (PC) ================= */
 .app-header {
-  position: relative;
-  height: 150px;
   width: 100%;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain; /* L'image s'affiche désormais ENTIÈREMENT sans zoom forcé */
+  height: auto; 
+  background: none; 
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
   padding: 15px 25px;
-  transition: background 0.4s ease-in-out;
+}
+
+.app-header.user-mode {
+  background: none;
 }
 
 /* Couleurs de fond adaptées pour fusionner avec les bords des bannières sur grand écran */
 .app-header.user-mode {
   background-image: url("../img/baniere_bleue.png");
   background-color: #0c1c3e;
+  background-size: cover;
 }
 .app-header.admin-mode {
   background-image: url("../img/baniere_noire.png");
@@ -48,15 +48,18 @@ main {
 
 /* Sélecteur de mode (PC) */
 .mode-switcher {
+  position: absolute;
+  bottom: 10px;
+  right: 15px;
   display: flex;
   gap: 4px;
   background: rgba(0, 0, 0, 0.25);
   padding: 5px;
   border-radius: 30px;
-  backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 10;
 }
+
 
 .btn {
   padding: 8px 20px;
@@ -110,6 +113,8 @@ main {
   cursor: pointer;
   padding: 4px 12px;
   transition: all 0.2s ease;
+  display: inline-block;
+  text-decoration: none;
 }
 .nav-btn:hover {
   opacity: 0.8;
@@ -280,9 +285,10 @@ main {
 @media (max-width: 768px) {
   /* 1. Header sur mobile */
   .app-header {
-    height: 110px;
-    padding: 10px 15px;
-    background-size: cover; /* On garde cover uniquement sur mobile car le rendu te plaisait */
+    height: 150px;
+    background-size: auto 100%; /* garde la proportion et remplit la hauteur */
+    background-position: center;
+    background-repeat: no-repeat;
   }
 
   /* RETRECISSEMENT DES BOUTONS SUR MOBILE */
@@ -428,3 +434,68 @@ footer {
   color: #555;
   white-space: nowrap;
 }
+
+/*page recherche formulaire */
+.formulaire {
+  text-align: center;
+  padding: 30px 20px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.formulaire h2 {
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.form-box {
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 25px 20px;
+  text-align: left;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+  background-color: white;
+  appearance: auto;
+}
+
+.btn-rechercher {
+  width: 100%;
+  padding: 12px;
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.btn-rechercher:hover {
+  background-color: #333;
+}
+
+/*page carte formulaire */
