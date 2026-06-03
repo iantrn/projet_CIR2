@@ -14,7 +14,6 @@ require_once 'config/db.php';
 </head>
 <body>
 <header id="app-header" class="app-header user-mode">
-  <!-- Les ID ont été rétablis sur les boutons pour permettre le clic en JS -->
   <div class="mode-switcher">
     <button id="btn-mode-user" class="btn active">Utilisateur</button>
     <button id="btn-mode-admin" class="btn">Admin</button>

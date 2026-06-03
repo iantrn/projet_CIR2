@@ -14,21 +14,25 @@ if (mapContainer) {
 }
 
 // =========================================================================
-// 2. Gestion de la bascule Mode Utilisateur / Mode Admin
+// 2. Gestion globale et persistante de la bascule Mode Admin / Utilisateur
 // =========================================================================
-const btnUser = document.getElementById('btn-mode-user');
-const btnAdmin = document.getElementById('btn-mode-admin');
-const adminElements = document.querySelectorAll('.admin-only');
-const appHeader = document.getElementById('app-header');
-const appNavbar = document.getElementById('app-navbar');
-
 function switchMode(mode) {
+    const btnUser = document.getElementById('btn-mode-user');
+    const btnAdmin = document.getElementById('btn-mode-admin');
+    const appHeader = document.getElementById('app-header');
+    const appNavbar = document.getElementById('app-navbar');
+    const adminElements = document.querySelectorAll('.admin-only');
+
     if (mode === 'admin') {
         if (btnAdmin) btnAdmin.classList.add('active');
         if (btnUser) btnUser.classList.remove('active');
-        adminElements.forEach(el => el.classList.remove('hidden'));
         
-        // Changement vers la bannière et la navbar admin (noires)
+        // Affiche les éléments réservés à l'admin s'ils existent sur la page
+        if (adminElements) {
+            adminElements.forEach(el => el.classList.remove('hidden'));
+        }
+        
+        // Bascule des classes CSS pour l'en-tête (Bannière noire en CSS) et la Navbar
         if (appHeader) {
             appHeader.classList.remove('user-mode');
             appHeader.classList.add('admin-mode');
@@ -40,9 +44,11 @@ function switchMode(mode) {
     } else {
         if (btnUser) btnUser.classList.add('active');
         if (btnAdmin) btnAdmin.classList.remove('active');
-        adminElements.forEach(el => el.classList.add('hidden'));
         
-        // Changement vers la bannière et la navbar utilisateur (bleues)
+        if (adminElements) {
+            adminElements.forEach(el => el.classList.add('hidden'));
+        }
+        
         if (appHeader) {
             appHeader.classList.remove('admin-mode');
             appHeader.classList.add('user-mode');
@@ -53,49 +59,67 @@ function switchMode(mode) {
         }
     }
     
-    // Forcer Leaflet à recalculer sa taille si la carte est présente
+    // Si la carte Leaflet est présente sur la page, on force son recalcul fluide
     if (map) {
         setTimeout(() => { map.invalidateSize(); }, 300);
     }
 }
 
-// Ajout sécurisé des écouteurs sur les boutons de mode
+// Écouteurs d'événements pour les clics sur les boutons (sécurisés avec des conditions)
+const btnUser = document.getElementById('btn-mode-user');
+const btnAdmin = document.getElementById('btn-mode-admin');
+
 if (btnUser) {
-    btnUser.addEventListener('click', () => switchMode('user'));
+    btnUser.addEventListener('click', () => {
+        localStorage.setItem('breizhwatt-mode', 'user'); // Sauvegarde le choix
+        switchMode('user');
+    });
 }
+
 if (btnAdmin) {
-    btnAdmin.addEventListener('click', () => switchMode('admin'));
+    btnAdmin.addEventListener('click', () => {
+        localStorage.setItem('breizhwatt-mode', 'admin'); // Sauvegarde le choix
+        switchMode('admin');
+    });
 }
 
-// =========================================================================
-// 3. Gestion des fenêtres Modales (Popups) et Actions Spécifiques
-// =========================================================================
-const modalDetail = document.getElementById('modal-detail');
-const modalAdd = document.getElementById('modal-add');
-const modalEdit = document.getElementById('modal-edit');
+// RESTAURATION AUTOMATIQUE : Applique le mode mémorisé dès le chargement de la page actuelle
+const savedMode = localStorage.getItem('breizhwatt-mode') || 'user';
+switchMode(savedMode);
 
-// Fermer toutes les fenêtres au clic sur la croix "X"
+
+// =========================================================================
+// 3. Gestion sécurisée des fenêtres Modales et listes (si présentes sur la page)
+// =========================================================================
+
+// Fermer toutes les fenêtres modales au clic sur la croix "X"
 document.querySelectorAll('.close-modal').forEach(cross => {
     cross.addEventListener('click', () => {
+        const modalDetail = document.getElementById('modal-detail');
+        const modalAdd = document.getElementById('modal-add');
+        const modalEdit = document.getElementById('modal-edit');
         if (modalDetail) modalDetail.classList.add('hidden');
         if (modalAdd) modalAdd.classList.add('hidden');
         if (modalEdit) modalEdit.classList.add('hidden');
     });
 });
 
-// Ouvrir le formulaire d'ajout (Bouton Admin)
+// Ouvrir le formulaire d'ajout
 const btnAddStation = document.getElementById('btn-add-station');
 if (btnAddStation) {
     btnAddStation.addEventListener('click', () => {
+        const modalAdd = document.getElementById('modal-add');
         if (modalAdd) modalAdd.classList.remove('hidden');
     });
 }
 
-// Écouteur global sur la liste (si présente)
+// Écouteur sur la liste des stations
 const stationsList = document.getElementById('stations-list');
 if (stationsList) {
     stationsList.addEventListener('click', (e) => {
-        // Clic sur bouton "Détail"
+        const modalDetail = document.getElementById('modal-detail');
+        const modalEdit = document.getElementById('modal-edit');
+        
         if (e.target.classList.contains('btn-detail') && modalDetail) {
             document.getElementById('detail-title').innerText = "Electric 50 Charg";
             document.getElementById('detail-body').innerHTML = `
@@ -107,7 +131,6 @@ if (stationsList) {
             modalDetail.classList.remove('hidden');
         }
         
-        // Clic sur bouton "Modifier" (Visible uniquement en Admin)
         if (e.target.classList.contains('btn-edit') && modalEdit) {
             document.getElementById('edit-station-id').value = "123"; 
             document.getElementById('edit-nom').value = "Electric 50 Charg";
@@ -117,17 +140,15 @@ if (stationsList) {
     });
 }
 
-// Écouteur du bouton Rechercher (S'adapte à #btn-search ou .btn-rechercher)
+// Écouteur sur les boutons de recherche ou de filtrage
 const btnSearch = document.getElementById('btn-search') || document.querySelector('.btn-rechercher');
 if (btnSearch) {
     btnSearch.addEventListener('click', () => {
-        const inputSearch = document.getElementById('search-input');
-        const inputVal = inputSearch ? inputSearch.value : "";
-        
-        if (inputVal.trim() !== "") {
-            alert("Recherche de : " + inputVal + "\n(Bientôt relié aux données de la BDD via AJAX !)");
+        const searchInput = document.getElementById('search-input');
+        if (searchInput && searchInput.value.trim() !== "") {
+            alert("Recherche de : " + searchInput.value + "\n(Bientôt relié aux données de la BDD via AJAX !)");
         } else {
-            alert("Filtrage ou recherche déclenchée !");
+            alert("Action de recherche ou filtrage déclenchée !");
         }
     });
 }
