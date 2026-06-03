@@ -3,17 +3,11 @@
 require_once 'config/db.php'; 
 
 $amenageurs = [];
-$prises = [];
 
 try {
-    // Récupération des aménageurs depuis la table AMENAGEUR
-    $stmtAmenageurs = $pdo->query("SELECT id_amenageur, nom_amenageur FROM AMENAGEUR ORDER BY nom_amenageur ASC");
+    // Récupération des aménageurs depuis la table correcte : amenageur_operateur
+    $stmtAmenageurs = $pdo->query("SELECT id_amenageur, nom_amenageur_operateur FROM amenageur_operateur ORDER BY nom_amenageur_operateur ASC");
     $amenageurs = $stmtAmenageurs->fetchAll();
-
-    // Récupération des types de prise depuis la table TYPE_PRISE
-    $stmtPrises = $pdo->query("SELECT id_type, libelle_type FROM TYPE_PRISE ORDER BY libelle_type ASC");
-    $prises = $stmtPrises->fetchAll();
-
 } catch (PDOException $e) {
     $error_msg = "Erreur BDD : " . $e->getMessage();
 }
@@ -24,11 +18,17 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BreizhWatt - Bornes de Recharge IRVE</title>
+    <title>BreizhWatt</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<?php if (!empty($error_msg)): ?>
+    <div style="background-color: #ffebee; color: #c62828; border: 2px solid #ef5350; padding: 15px; margin: 20px; border-radius: 8px; font-family: sans-serif;">
+        ⚠️ <?= htmlspecialchars($error_msg) ?>
+    </div>
+<?php endif; ?>
+
 <header id="app-header" class="app-header user-mode">
   <div class="mode-switcher">
     <button id="btn-mode-user" class="btn active">Utilisateur</button>
@@ -51,8 +51,8 @@ try {
           <label for="amenageur">Aménageur</label>
           <select id="amenageur" name="amenageur">
             <option value="">-- Sélectionner --</option>
-            <?php foreach ($amenageurs as $amenageur): ?>
-                <option value="<?= htmlspecialchars($amenageur) ?>"><?= htmlspecialchars($amenageur) ?></option>
+            <?php foreach ($amenageurs as $row): ?>
+                <option value="<?= htmlspecialchars($row['id_amenageur']) ?>"><?= htmlspecialchars($row['nom_amenageur_operateur']) ?></option>
             <?php endforeach; ?>
           </select>
         </div>
@@ -61,9 +61,11 @@ try {
           <label for="type_prise">Type de prise</label>
           <select id="type_prise" name="type_prise">
             <option value="">-- Sélectionner --</option>
-            <?php foreach ($prises as $prise): ?>
-                <option value="<?= htmlspecialchars($prise) ?>"><?= htmlspecialchars($prise) ?></option>
-            <?php endforeach; ?>
+            <option value="prise_ef">Prise EF (Standard Non-Générique)</option>
+            <option value="prise_t2">Prise Type 2 (T2)</option>
+            <option value="prise_combo_ccs">Prise Combo CCS</option>
+            <option value="prise_chademo">Prise CHAdeMO</option>
+            <option value="prise_autre">Autre type de prise</option>
           </select>
         </div>
     
@@ -89,11 +91,5 @@ try {
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="js/main.js"></script>
-</body>
-<?php if (!empty($error_msg)): ?>
-    <div style="background-color: #ffebee; color: #c62828; border: 2px solid #ef5350; padding: 15px; margin: 20px; border-radius: 8px; font-family: sans-serif; font-weight: bold;">
-        ⚠️ Erreur détectée : <?= htmlspecialchars($error_msg) ?>
-    </div>
-<?php endif; ?>
+<script src="js/main.js?v=1"></script>   </body>
 </html>

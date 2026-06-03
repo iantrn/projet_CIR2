@@ -1,18 +1,40 @@
-<?php
-require_once 'config/db.php';
+<?php 
+// On inclut la connexion à la BDD pour être prêt à faire des requêtes
+require_once 'config/db.php'; 
 
-$tables_to_check = ['point_de_recharge', 'station', 'commune', 'amenageur_operateur', 'departement'];
-echo "<pre>--- COLONNES DE VOS TABLES --- \n";
-foreach ($tables_to_check as $table) {
-    try {
-        $cols = $pdo->query("DESCRIBE `$table`")->fetchAll(PDO::FETCH_COLUMN);
-        echo "\n📍 Table $table :\n" . implode(", ", $cols) . "\n";
-    } catch (Exception $e) {
-        echo "\n❌ Impossible de lire la table $table : " . $e->getMessage() . "\n";
-    }
+// Initialisation des variables pour éviter les erreurs d'affichage
+$total = $annee2020 = $annee2021 = $annee2022 = 0;
+$dept29 = $dept22 = $dept56 = $dept35 = 0;
+$nbAmenageurs = 0;
+$nbTypesPrise = 5; // Structure IRVE fixe (EF, T2, Combo CCS, CHAdeMO, Autre)
+
+try {
+    // 1. Total des points de recharge
+    $total = $pdo->query("SELECT COUNT(*) FROM point_de_recharge")->fetchColumn();
+
+    // 2. Statistiques par année (extraction de l'année depuis la date de mise en service)
+    $annee2020 = $pdo->query("SELECT COUNT(*) FROM point_de_recharge WHERE YEAR(date_mise_en_service) = 2020")->fetchColumn();
+    $annee2021 = $pdo->query("SELECT COUNT(*) FROM point_de_recharge WHERE YEAR(date_mise_en_service) = 2021")->fetchColumn();
+    $annee2022 = $pdo->query("SELECT COUNT(*) FROM point_de_recharge WHERE YEAR(date_mise_en_service) = 2022")->fetchColumn();
+
+    // 3. Statistiques par département (Jointure : Point -> Station -> Commune)
+    $baseDeptQuery = "SELECT COUNT(*) FROM point_de_recharge p 
+                      JOIN station s ON p.id_station_interne = s.id_station_interne 
+                      JOIN commune c ON s.code_insee = c.code_insee 
+                      WHERE c.code_dep = ";
+                      
+    $dept22 = $pdo->query($baseDeptQuery . "'22'")->fetchColumn();
+    $dept29 = $pdo->query($baseDeptQuery . "'29'")->fetchColumn();
+    $dept35 = $pdo->query($baseDeptQuery . "'35'")->fetchColumn();
+    $dept56 = $pdo->query($baseDeptQuery . "'56'")->fetchColumn();
+
+    // 4. Nombre d'aménageurs uniques
+    $nbAmenageurs = $pdo->query("SELECT COUNT(*) FROM amenageur_operateur")->fetchColumn();
+
+} catch (PDOException $e) {
+    // En cas d'erreur, on peut l'afficher temporairement pour débugger
+    $error_msg = "Erreur BDD : " . $e->getMessage();
 }
-echo "</pre>";
-die();
 ?>
 
 <!DOCTYPE html>
@@ -20,11 +42,17 @@ die();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BreizhWatt - Bornes de Recharge IRVE</title>
+    <title>BreizhWatt</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<?php if (!empty($error_msg)): ?>
+    <div style="background-color: #ffebee; color: #c62828; border: 2px solid #ef5350; padding: 15px; margin: 20px; border-radius: 8px; font-family: sans-serif;">
+        ⚠️ <?= htmlspecialchars($error_msg) ?>
+    </div>
+<?php endif; ?>
+
 <header id="app-header" class="app-header user-mode">
   <div class="mode-switcher">
     <button id="btn-mode-user" class="btn active">Utilisateur</button>
@@ -134,11 +162,5 @@ die();
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="js/main.js"></script>
-</body>
-<?php if (!empty($error_msg)): ?>
-    <div style="background-color: #ffebee; color: #c62828; border: 2px solid #ef5350; padding: 15px; margin: 20px; border-radius: 8px; font-family: sans-serif; font-weight: bold;">
-        ⚠️ Erreur détectée : <?= htmlspecialchars($error_msg) ?>
-    </div>
-<?php endif; ?>
+<script src="js/main.js?v=1"></script> </body>
 </html>

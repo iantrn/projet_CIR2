@@ -5,8 +5,8 @@ require_once 'config/db.php';
 $annees = [];
 
 try {
-    // Récupération dynamique et unique des années d'installation depuis la table BORNE
-    $stmtAnnees = $pdo->query("SELECT DISTINCT annee_installation FROM BORNE WHERE annee_installation IS NOT NULL ORDER BY annee_installation DESC");
+    // Récupération dynamique des années réelles à partir de date_mise_en_service
+    $stmtAnnees = $pdo->query("SELECT DISTINCT YEAR(date_mise_en_service) as annee FROM point_de_recharge WHERE date_mise_en_service IS NOT NULL ORDER BY annee DESC");
     $annees = $stmtAnnees->fetchAll(PDO::FETCH_COLUMN);
 } catch (PDOException $e) {
     $error_msg = "Erreur BDD : " . $e->getMessage();
@@ -23,6 +23,12 @@ try {
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<?php if (!empty($error_msg)): ?>
+    <div style="background-color: #ffebee; color: #c62828; border: 2px solid #ef5350; padding: 15px; margin: 20px; border-radius: 8px; font-family: sans-serif;">
+        ⚠️ <?= htmlspecialchars($error_msg) ?>
+    </div>
+<?php endif; ?>
+
 <header id="app-header" class="app-header user-mode">
   <div class="mode-switcher">
     <button id="btn-mode-user" class="btn active">Utilisateur</button>
@@ -35,7 +41,7 @@ try {
     <a href="carte.php" class="nav-btn">Carte</a>
 </nav>
 
-<main class=\"main-container\">
+<main class="main-container">
     <section class="sidebar">
         <div class="formulaire-carte">
           <h2>Filtrer la carte</h2>
@@ -78,6 +84,5 @@ try {
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="js/main.js"></script>
-</body>
+<script src="js/main.js?v=1"></script>  </body>
 </html>
