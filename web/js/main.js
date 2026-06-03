@@ -132,4 +132,63 @@ document.addEventListener('DOMContentLoaded', () => {
             loadMapMarkers(anneeSelectionnee, departementSelectionne);
         });
     }
+    // =========================================================================
+// 4. Gestion de la Recherche Dynamique (Page recherche.php)
+// =========================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const btnSearchPage = document.getElementById('btn-search');
+    
+    if (btnSearchPage && document.getElementById('search-table-body')) {
+        btnSearchPage.addEventListener('click', () => {
+            // Récupération des valeurs sélectionnées dans les listes déroulantes
+            const amenageur = document.getElementById('amenageur').value;
+            const typePrise = document.getElementById('type_prise').value;
+            const departement = document.getElementById('departement').value;
+
+            // Appel AJAX à notre API de recherche
+            fetch(`api/search_stations.php?amenageur=${amenageur}&type_prise=${typePrise}&departement=${departement}`)
+                .then(response => {
+                    if (!response.ok) throw new Error("Erreur de recherche");
+                    return response.json();
+                })
+                .then(data => {
+                    const container = document.getElementById('search-results-container');
+                    const tbody = document.getElementById('search-table-body');
+                    const countSpan = document.getElementById('results-count');
+
+                    // On vide le tableau précédent
+                    tbody.innerHTML = '';
+                    countSpan.textContent = data.length;
+
+                    if (data.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="4" style="padding: 15px; text-align: center; color: #777;">Aucune borne ne correspond à ces critères.</td></tr>`;
+                    } else {
+                        // On boucle sur les lignes trouvées pour construire le tableau
+                        data.forEach(station => {
+                            const tr = document.createElement('tr');
+                            tr.style.borderBottom = "1px solid #eee";
+                            
+                            // Détection du mode actuel (admin ou user) pour afficher/masquer le bouton modifier
+                            const currentMode = localStorage.getItem('breizhwatt-mode') || 'user';
+                            const adminClass = (currentMode === 'admin') ? '' : 'hidden';
+
+                            tr.innerHTML = `
+                                <td style="padding: 12px; font-weight: bold; color: #333;">${station.nom_station}</td>
+                                <td style="padding: 12px; color: #555;">${station.nom_amenageur_operateur || 'Inconnu'}</td>
+                                <td style="padding: 12px; font-size: 13px; color: #666;"><strong>${station.nom_commune}</strong><br>${station.adresse_station}</td>
+                                <td style="padding: 12px;" class="admin-only ${adminClass}">
+                                    <button class="btn-edit-station-trigger" data-id="${station.id_station_interne}" style="background-color: #29b6f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">✏️ Modifier</button>
+                                </td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    }
+
+                    // On affiche enfin le bloc de résultats
+                    container.classList.remove('hidden');
+                })
+                .catch(error => console.error("Erreur lors de la recherche :", error));
+        });
+    }
+});
 });
