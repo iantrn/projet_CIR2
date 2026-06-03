@@ -27,31 +27,31 @@ function loadMapMarkers(annee, departement) {
         .then(stations => {
             markersGroup.clearLayers();
 
-            stations.forEach(station => {
-                const lat = parseFloat(station.latitude);
-                const lng = parseFloat(station.longitude);
+            stations.forEach(s => {
+                // Construction de la liste des prises disponibles
+                let prises = [];
+                if(s.prise_ef == 1) prises.push("EF");
+                if(s.prise_t2 == 1) prises.push("T2");
+                if(s.prise_combo_ccs == 1) prises.push("CCS");
+                if(s.prise_chademo == 1) prises.push("CHA");
+                
+                const marker = L.marker([parseFloat(s.latitude), parseFloat(s.longitude)]);
 
-                if (!isNaN(lat) && !isNaN(lng)) {
-                    const marker = L.marker([lat, lng]);
-
-                    // Ici on enrichit la popup avec plus de détails
-                    marker.bindPopup(`
-                        <div style="font-family: sans-serif; min-width: 200px;">
-                            <strong style="color: #0c1c3e; font-size: 14px;">${station.nom_station}</strong><br>
-                            <hr style="margin: 5px 0;">
-                            <p style="margin: 2px 0; font-size: 12px;">
-                                📍 <b>Adresse :</b> ${station.adresse_station}<br>
-                                ⚡ <b>Aménageur :</b> ${station.nom_amenageur_operateur || 'Non spécifié'}<br>
-                                🔌 <b>Localisation :</b> ${station.nom_commune || 'Bretagne'}
-                            </p>
-                        </div>
-                    `);
-
-                    markersGroup.addLayer(marker);
-                }
+                marker.bindPopup(`
+                    <div style="font-family: sans-serif; min-width: 250px;">
+                        <strong style="color: #0c1c3e; font-size: 14px;">${s.nom_station}</strong><br>
+                        <hr style="margin: 5px 0;">
+                        <p style="margin: 2px 0; font-size: 12px;">
+                            📍 <b>Adresse :</b> ${s.adresse_station}<br>
+                            ⚡ <b>Puissance :</b> ${s.puissance_nominale ? s.puissance_nominale + ' kW' : 'Non précisé'}<br>
+                            🔌 <b>Prises :</b> ${prises.length > 0 ? prises.join(', ') : 'Non précisé'}<br>
+                            💰 <b>Tarification :</b> ${s.tarification || 'Non précisé'}
+                        </p>
+                    </div>
+                `);
+                markersGroup.addLayer(marker);
             });
-        })
-        .catch(error => console.error("Erreur :", error));
+        });
 }
 
 // =========================================================================
