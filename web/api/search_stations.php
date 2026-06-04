@@ -7,12 +7,20 @@ try {
     $type_prise = isset($_GET['type_prise']) ? $_GET['type_prise'] : '';
     $departement = isset($_GET['departement']) ? $_GET['departement'] : '';
 
-    // AJOUT : Sélection de la tarification et des indicateurs de prises
-    $sql = "SELECT DISTINCT s.id_station_interne, s.nom_station, s.adresse_station, 
-                    a.nom_amenageur_operateur, c.nom_commune,
-                    p.tarification, p.prise_ef, p.prise_t2, p.prise_combo_ccs, p.prise_chademo, p.prise_autre
-            FROM point_de_recharge p
-            JOIN station s ON p.id_station_interne = s.id_station_interne
+    // CORRECTION REQUÊTE : On groupe par station et on utilise MAX() pour consolider les données techniques
+    $sql = "SELECT s.id_station_interne, 
+                   s.nom_station, 
+                   s.adresse_station, 
+                   a.nom_amenageur_operateur, 
+                   c.nom_commune,
+                   MAX(p.tarification) AS tarification,
+                   MAX(p.prise_ef) AS prise_ef,
+                   MAX(p.prise_t2) AS prise_t2,
+                   MAX(p.prise_combo_ccs) AS prise_combo_ccs,
+                   MAX(p.prise_chademo) AS prise_chademo,
+                   MAX(p.prise_autre) AS prise_autre
+            FROM station s
+            JOIN point_de_recharge p ON s.id_station_interne = p.id_station_interne
             JOIN commune c ON s.code_insee = c.code_insee
             LEFT JOIN amenageur_operateur a ON p.id_amenageur = a.id_amenageur
             WHERE 1=1";
@@ -34,6 +42,9 @@ try {
         $params['departement'] = $departement;
     }
 
+    // On ajoute le GROUP BY indispensable pour fusionner les points de recharge d'une même station
+    $sql .= " GROUP BY s.id_station_interne, s.nom_station, s.adresse_station, a.nom_amenageur_operateur, c.nom_commune";
+    
     $sql .= " LIMIT 200";
 
     $stmt = $pdo->prepare($sql);
