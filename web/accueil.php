@@ -116,6 +116,22 @@ try {
               <span class="stat-dash">— 2022 →</span>
               <span class="stat-value" id="annee-2022"><?= htmlspecialchars($annee2022) ?></span>
             </div>
+            <div class="stat-subrow">
+              <span class="stat-dash">— 2023 →</span>
+              <span class="stat-value" id="annee-2022"><?= htmlspecialchars($annee2023) ?></span>
+            </div>
+            <div class="stat-subrow">
+              <span class="stat-dash">— 2024 →</span>
+              <span class="stat-value" id="annee-2022"><?= htmlspecialchars($annee2024) ?></span>
+            </div>
+            <div class="stat-subrow">
+              <span class="stat-dash">— 2025 →</span>
+              <span class="stat-value" id="annee-2022"><?= htmlspecialchars($annee2025) ?></span>
+            </div>
+            <div class="stat-subrow">
+              <span class="stat-dash">— 2026 →</span>
+              <span class="stat-value" id="annee-2022"><?= htmlspecialchars($annee2026) ?></span>
+            </div>
           </div>
         </div>
       </div>
