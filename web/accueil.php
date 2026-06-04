@@ -16,6 +16,11 @@ try {
     $annee2020 = $pdo->query("SELECT COUNT(*) FROM point_de_recharge WHERE YEAR(date_mise_en_service) = 2020")->fetchColumn();
     $annee2021 = $pdo->query("SELECT COUNT(*) FROM point_de_recharge WHERE YEAR(date_mise_en_service) = 2021")->fetchColumn();
     $annee2022 = $pdo->query("SELECT COUNT(*) FROM point_de_recharge WHERE YEAR(date_mise_en_service) = 2022")->fetchColumn();
+    $annee2023 = $pdo->query("SELECT COUNT(*) FROM point_de_recharge WHERE YEAR(date_mise_en_service) = 2023")->fetchColumn();
+    $annee2024 = $pdo->query("SELECT COUNT(*) FROM point_de_recharge WHERE YEAR(date_mise_en_service) = 2024")->fetchColumn();
+    $annee2025 = $pdo->query("SELECT COUNT(*) FROM point_de_recharge WHERE YEAR(date_mise_en_service) = 2025")->fetchColumn();
+    $annee2026 = $pdo->query("SELECT COUNT(*) FROM point_de_recharge WHERE YEAR(date_mise_en_service) = 2026")->fetchColumn();
+
 
     // 3. Statistiques par département (Jointure : Point -> Station -> Commune)
     $baseDeptQuery = "SELECT COUNT(*) FROM point_de_recharge p 
