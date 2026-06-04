@@ -79,8 +79,8 @@ try {
     </section>
 </main>
 
-<footer>
-  <p>© 2026 - CIR2 Gabriel T, Ian T</p>
+<footer class="footer-user">
+  <p>© 2026 - Espace Public CIR2 Gabriel T, Ian T</p>
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

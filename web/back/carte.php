@@ -10,6 +10,17 @@ require_once '../config/db.php';
     <title>BreizhWatt - Carte Admin</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* Force la couleur #1a1a1a et le gras sur le footer uniquement en mode admin */
+        footer {
+            background: #1a1a1a !important;
+            background-color: #1a1a1a !important;
+        }
+        footer p {
+            color: #ffffff !important;
+            font-weight: bold !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -60,8 +71,8 @@ require_once '../config/db.php';
     </div>
 </div>
 
-<footer style="background: #1a1a1a !important; background-color: #1a1a1a !important; display: block !important; visibility: visible !important; opacity: 1 !important; padding: 20px 0 !important;">
-  <p style="color: #ffffff !important; margin: 0 !important; text-align: center !important; font-weight: bold !important;">© 2026 - Espace Privé CIR2 Gabriel T, Ian T</p>
+<footer class="footer-admin">
+  <p>© 2026 - Espace Privé CIR2 Gabriel T, Ian T</p>
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

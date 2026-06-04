@@ -43,6 +43,17 @@ try {
     <title>BreizhWatt - Admin</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* Change la couleur du footer uniquement en présence du header admin */
+        body:has(.admin-mode) footer {
+            background-color: #1a1a1a !important;
+            background: #1a1a1a !important;
+        }
+        body:has(.admin-mode) footer p {
+            color: #ffffff !important;
+            font-weight: bold !important;
+        }
+    </style>
 </head>
 <body>
 <?php if (!empty($error_msg)): ?>
@@ -138,10 +149,9 @@ try {
     </div>
 </div>
 
-<footer style="background: #1a1a1a !important; background-color: #1a1a1a !important; display: block !important; visibility: visible !important; opacity: 1 !important; padding: 20px 0 !important;">
-  <p style="color: #ffffff !important; margin: 0 !important; text-align: center !important; font-weight: bold !important;">© 2026 - Espace Privé CIR2 Gabriel T, Ian T</p>
+<footer class="footer-admin">
+  <p>© 2026 - Espace Privé CIR2 Gabriel T, Ian T</p>
 </footer>
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="../js/main.js?v=back" id="main-script" data-mode="admin"></script>
 </body>

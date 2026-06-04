@@ -200,15 +200,6 @@ main {
   }
 }
 
-footer {
-  background-color: #3498db;
-  color: white;
-  text-align: center;
-  padding: 12px 0;
-  font-size: 14px;
-  width: 100%;
-}
-
 /* Page accueil présentation */
 .presentation {
   text-align: center;
@@ -345,4 +336,24 @@ footer {
 }
 .btn-rechercher:hover {
   background-color: #333;
+}
+footer.footer-user {
+    background-color: #3498db !important;
+    color: white !important;
+    padding: 15px;
+    text-align: center;
+    width: 100%;
+}
+
+footer.footer-admin {
+    background: #1a1a1a !important;
+    padding: 15px;
+    text-align: center;
+    width: 100%;
+    border-top: 3px solid #d32f2f;
+}
+
+footer.footer-admin p {
+    color: #ffffff !important;
+    font-weight: bold !important;
 }
