@@ -108,7 +108,7 @@ try {
             <div class="stat-subrow"><span class="stat-dash">— 2025 →</span><span class="stat-value"><?= htmlspecialchars($annee2025) ?></span></div>
             <div class="stat-subrow"><span class="stat-dash">— 2026 →</span><span class="stat-value"><?= htmlspecialchars($annee2026) ?></span></div>
             <div class="stat-subrow" style="border-top: 1px dashed #bbb; margin-top: 5px; padding-top: 5px; font-weight: bold; color: #d32f2f;">
-              <span class="stat-dash">TOTAL ÉVALUÉ →</span>
+              <span class="stat-dash">TOTAL →</span>
               <span class="stat-value"><?= htmlspecialchars($totalAnnees) ?></span>
             </div>
           </div>
