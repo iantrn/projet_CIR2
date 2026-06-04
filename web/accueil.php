@@ -3,7 +3,7 @@
 require_once 'config/db.php'; 
 
 // Initialisation des variables pour éviter les erreurs d'affichage
-$total = $annee2020 = $annee2021 = $annee2022 = 0;
+$total = $annee2020 = $annee2021 = $annee2022 = $annee2023 = $annee2024 = $annee2025 = $annee2026 = 0;
 $dept29 = $dept22 = $dept56 = $dept35 = 0;
 $nbAmenageurs = 0;
 $nbTypesPrise = 5; // Structure IRVE fixe (EF, T2, Combo CCS, CHAdeMO, Autre)
@@ -21,6 +21,8 @@ try {
     $annee2025 = $pdo->query("SELECT COUNT(*) FROM point_de_recharge WHERE YEAR(date_mise_en_service) = 2025")->fetchColumn();
     $annee2026 = $pdo->query("SELECT COUNT(*) FROM point_de_recharge WHERE YEAR(date_mise_en_service) = 2026")->fetchColumn();
 
+    // Calcul automatique du total de la section années
+    $totalAnnees = $annee2020 + $annee2021 + $annee2022 + $annee2023 + $annee2024 + $annee2025 + $annee2026;
 
     // 3. Statistiques par département (Jointure : Point -> Station -> Commune)
     $baseDeptQuery = "SELECT COUNT(*) FROM point_de_recharge p 
@@ -33,11 +35,14 @@ try {
     $dept35 = $pdo->query($baseDeptQuery . "'35'")->fetchColumn();
     $dept56 = $pdo->query($baseDeptQuery . "'56'")->fetchColumn();
 
+    // Calcul automatique du total de la section départements
+    $totalDepts = $dept22 + $dept29 + $dept35 + $dept56;
+
     // 4. Nombre d'aménageurs uniques
     $nbAmenageurs = $pdo->query("SELECT COUNT(*) FROM amenageur_operateur")->fetchColumn();
 
 } catch (PDOException $e) {
-    // En cas d'erreur, on peut l'afficher temporairement pour débugger
+    // En cas d'erreur, on l'affiche temporairement pour débugger
     $error_msg = "Erreur BDD : " . $e->getMessage();
 }
 ?>
@@ -102,7 +107,7 @@ try {
 
       <div class="stat-box">
         <div class="stat-row">
-          <span class="stat-label">Nombre de points</span>
+          <span class="stat-label">Nombre de points par année</span>
           <div class="stat-sub">
             <div class="stat-subrow">
               <span class="stat-dash">— 2020 →</span>
@@ -118,19 +123,23 @@ try {
             </div>
             <div class="stat-subrow">
               <span class="stat-dash">— 2023 →</span>
-              <span class="stat-value" id="annee-2022"><?= htmlspecialchars($annee2023) ?></span>
+              <span class="stat-value" id="annee-2023"><?= htmlspecialchars($annee2023) ?></span>
             </div>
             <div class="stat-subrow">
               <span class="stat-dash">— 2024 →</span>
-              <span class="stat-value" id="annee-2022"><?= htmlspecialchars($annee2024) ?></span>
+              <span class="stat-value" id="annee-2024"><?= htmlspecialchars($annee2024) ?></span>
             </div>
             <div class="stat-subrow">
               <span class="stat-dash">— 2025 →</span>
-              <span class="stat-value" id="annee-2022"><?= htmlspecialchars($annee2025) ?></span>
+              <span class="stat-value" id="annee-2025"><?= htmlspecialchars($annee2025) ?></span>
             </div>
             <div class="stat-subrow">
               <span class="stat-dash">— 2026 →</span>
-              <span class="stat-value" id="annee-2022"><?= htmlspecialchars($annee2026) ?></span>
+              <span class="stat-value" id="annee-2026"><?= htmlspecialchars($annee2026) ?></span>
+            </div>
+            <div class="stat-subrow" style="border-top: 1px dashed #bbb; margin-top: 5px; padding-top: 5px; font-weight: bold;">
+              <span class="stat-dash" style="color: #0c1c3e;">TOTAL →</span>
+              <span class="stat-value" style="color: #0c1c3e;"><?= htmlspecialchars($totalAnnees) ?></span>
             </div>
           </div>
         </div>
@@ -138,7 +147,7 @@ try {
 
       <div class="stat-box">
         <div class="stat-row">
-          <span class="stat-label">Nombre de points</span>
+          <span class="stat-label">Nombre de points par département</span>
           <div class="stat-sub">
             <div class="stat-subrow">
               <span class="stat-dash">— Finistère →</span>
@@ -156,6 +165,10 @@ try {
               <span class="stat-dash">— Ille-et-Vilaine →</span>
               <span class="stat-value" id="dept-35"><?= htmlspecialchars($dept35) ?></span>
             </div>
+            <div class="stat-subrow" style="border-top: 1px dashed #bbb; margin-top: 5px; padding-top: 5px; font-weight: bold;">
+              <span class="stat-dash" style="color: #0c1c3e;">TOTAL REGIONAL →</span>
+              <span class="stat-value" style="color: #0c1c3e;"><?= htmlspecialchars($totalDepts) ?></span>
+            </div>
           </div>
         </div>
       </div>
@@ -170,7 +183,7 @@ try {
 
       <div class="stat-box">
         <div class="stat-row">
-          <span class="stat-label">Nombre de type de prise</span>
+          <span class="stat-label">Nombre de types de prise</span>
           <span class="stat-arrow">→</span>
           <span class="stat-value" id="nb-types-prise"><?= htmlspecialchars($nbTypesPrise) ?></span>
         </div>
