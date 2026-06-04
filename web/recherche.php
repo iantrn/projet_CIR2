@@ -5,8 +5,8 @@ require_once 'config/db.php';
 $amenageurs = [];
 
 try {
-    // Récupération des aménageurs depuis la table correcte : amenageur_operateur
-    $stmtAmenageurs = $pdo->query("SELECT id_amenageur, nom_amenageur_operateur FROM amenageur_operateur ORDER BY nom_amenageur_operateur ASC");
+    // Consigne : 20 aménageurs pris au hasard (ORDER BY RAND() LIMIT 20)
+    $stmtAmenageurs = $pdo->query("SELECT id_amenageur, nom_amenageur_operateur FROM amenageur_operateur ORDER BY RAND() LIMIT 20");
     $amenageurs = $stmtAmenageurs->fetchAll();
 } catch (PDOException $e) {
     $error_msg = "Erreur BDD : " . $e->getMessage();
@@ -19,7 +19,6 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BreizhWatt</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -85,6 +84,7 @@ try {
       </div>
     </div>
 </div>
+
 <div id="search-results-container" class="search-results hidden" style="max-width: 1000px; margin: 30px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
     <h3 style="margin-bottom: 15px; color: #0c1c3e;">Résultats de la recherche (<span id="results-count">0</span>)</h3>
     <div style="overflow-x: auto;">
@@ -94,18 +94,21 @@ try {
                     <th style="padding: 12px;">Station</th>
                     <th style="padding: 12px;">Aménageur</th>
                     <th style="padding: 12px;">Commune / Adresse</th>
-                    <th style="padding: 12px;">Prises</th>         <th style="padding: 12px;">Tarification</th>   <th style="padding: 12px;" class="admin-only hidden">Actions</th>
+                    <th style="padding: 12px;">Prises</th>
+                    <th style="padding: 12px;">Tarification</th>
+                    <th style="padding: 12px; display:none;" class="col-actions">Actions</th>
                 </tr>
             </thead>
-            <tbody id="search-table-body">
-                </tbody>
+            <tbody id="search-table-body"></tbody>
         </table>
     </div>
 </div>
+
 <footer class="footer-user">
   <p>© 2026 - Espace Public CIR2 Gabriel T, Ian T</p>
 </footer>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="js/main.js?v=1"></script>   </body>
+<!-- id="main-script" sans data-mode="admin" → mode lecture seule -->
+<script src="js/main.js?v=2" id="main-script" data-location="frontfolder"></script>
+</body>
 </html>

@@ -47,9 +47,9 @@ try {
           <h2>Filtrer la carte</h2>
           <div class="form-box">
             <div class="form-group">
-              <label for="annee">Année d'installation</label>
-              <select id="annee" name="annee">
-                <option value="">-- Sélectionner --</option>
+              <label for="filter-annee">Année d'installation</label>
+              <select id="filter-annee" name="filter-annee">
+                <option value="">-- Toutes --</option>
                 <?php foreach ($annees as $annee): ?>
                     <option value="<?= htmlspecialchars($annee) ?>"><?= htmlspecialchars($annee) ?></option>
                 <?php endforeach; ?>
@@ -57,9 +57,9 @@ try {
             </div>
         
             <div class="form-group">
-              <label for="departement">Département</label>
-              <select id="departement" name="departement">
-                <option value="">-- Sélectionner --</option>
+              <label for="filter-departement">Département</label>
+              <select id="filter-departement" name="filter-departement">
+                <option value="">-- Tous --</option>
                 <option value="22">Côtes-d'Armor (22)</option>
                 <option value="29">Finistère (29)</option>
                 <option value="35">Ille-et-Vilaine (35)</option>
@@ -67,10 +67,8 @@ try {
               </select>
             </div>
         
-            <button type="button" class="btn-rechercher">Filtrer les bornes</button>
+            <button type="button" class="btn-rechercher" id="btn-filter-carte">Filtrer les bornes</button>
           </div>
-          
-          <button id="btn-add-station" class="btn-success admin-only hidden" style="margin-top: 15px;">+ Ajouter une Borne</button>
         </div>
     </section>
 
@@ -84,5 +82,6 @@ try {
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="js/main.js?v=1"></script>  </body>
+<script src="js/main.js?v=2" id="main-script" data-location="frontfolder"></script>
+</body>
 </html>
