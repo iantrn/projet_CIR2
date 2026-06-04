@@ -85,23 +85,23 @@ try {
       </div>
     </div>
 </div>
-<div id="search-results-container" class="search-results hidden" style="max-width: 900px; margin: 30px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-        <h3 style="margin-bottom: 15px; color: #0c1c3e;">Résultats de la recherche (<span id="results-count">0</span>)</h3>
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; font-family: sans-serif; text-align: left;">
-                <thead>
-                    <tr style="background-color: #f4f6f7; border-bottom: 2px solid #ccc;">
-                        <th style="padding: 12px;">Station</th>
-                        <th style="padding: 12px;">Aménageur</th>
-                        <th style="padding: 12px;">Commune / Adresse</th>
-                        <th style="padding: 12px;" class="admin-only hidden">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="search-table-body">
-                    </tbody>
-            </table>
-        </div>
+<div id="search-results-container" class="search-results hidden" style="max-width: 1000px; margin: 30px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+    <h3 style="margin-bottom: 15px; color: #0c1c3e;">Résultats de la recherche (<span id="results-count">0</span>)</h3>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-family: sans-serif; text-align: left;">
+            <thead>
+                <tr style="background-color: #f4f6f7; border-bottom: 2px solid #ccc;">
+                    <th style="padding: 12px;">Station</th>
+                    <th style="padding: 12px;">Aménageur</th>
+                    <th style="padding: 12px;">Commune / Adresse</th>
+                    <th style="padding: 12px;">Prises</th>         <th style="padding: 12px;">Tarification</th>   <th style="padding: 12px;" class="admin-only hidden">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="search-table-body">
+                </tbody>
+        </table>
     </div>
+</div>
 <footer>
   <p>© 2026 - CIR2 Gabriel T, Ian T</p>
 </footer>

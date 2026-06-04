@@ -3,14 +3,14 @@ header('Content-Type: application/json');
 require_once '../config/db.php';
 
 try {
-    // Récupération des filtres envoyés en GET
     $amenageur = isset($_GET['amenageur']) ? $_GET['amenageur'] : '';
     $type_prise = isset($_GET['type_prise']) ? $_GET['type_prise'] : '';
     $departement = isset($_GET['departement']) ? $_GET['departement'] : '';
 
-    // Requête de base avec les jointures nécessaires
+    // AJOUT : Sélection de la tarification et des indicateurs de prises
     $sql = "SELECT DISTINCT s.id_station_interne, s.nom_station, s.adresse_station, 
-                    a.nom_amenageur_operateur, c.nom_commune
+                    a.nom_amenageur_operateur, c.nom_commune,
+                    p.tarification, p.prise_ef, p.prise_t2, p.prise_combo_ccs, p.prise_chademo, p.prise_autre
             FROM point_de_recharge p
             JOIN station s ON p.id_station_interne = s.id_station_interne
             JOIN commune c ON s.code_insee = c.code_insee
@@ -19,25 +19,21 @@ try {
 
     $params = [];
 
-    // Filtre Aménageur
     if (!empty($amenageur)) {
         $sql .= " AND p.id_amenageur = :amenageur";
         $params['amenageur'] = $amenageur;
     }
 
-    // CORRECTION ICI : On vérifie d'abord que $type_prise N'EST PAS vide avant de filtrer
     $allowed_prises = ['prise_ef', 'prise_t2', 'prise_combo_ccs', 'prise_chademo', 'prise_autre'];
     if (!empty($type_prise) && in_array($type_prise, $allowed_prises)) {
         $sql .= " AND p.$type_prise = 1";
     }
 
-    // Filtre Département
     if (!empty($departement)) {
         $sql .= " AND c.code_dep = :departement";
         $params['departement'] = $departement;
     }
 
-    // Sécurité de performance : on limite l'affichage aux 200 premières lignes pour le tableau
     $sql .= " LIMIT 200";
 
     $stmt = $pdo->prepare($sql);

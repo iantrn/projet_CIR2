@@ -134,63 +134,60 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (btnSearchPage) {
         btnSearchPage.addEventListener('click', () => {
-            // Récupération des valeurs sélectionnées dans les listes déroulantes
             const amenageur = document.getElementById('amenageur').value;
             const typePrise = document.getElementById('type_prise').value;
             const departement = document.getElementById('departement').value;
 
-            // Appel AJAX à notre API de recherche sécurisée
             fetch(`api/search_stations.php?amenageur=${amenageur}&type_prise=${typePrise}&departement=${departement}`)
-                .then(response => {
-                    if (!response.ok) throw new Error("Erreur serveur lors de la recherche");
-                    return response.json();
-                })
+                .then(r => r.json())
                 .then(data => {
-                    const container = document.getElementById('search-results-container');
                     const tbody = document.getElementById('search-table-body');
+                    const container = document.getElementById('search-results-container');
                     const countSpan = document.getElementById('results-count');
 
-                    if (!container || !tbody) return;
-
-                    // On vide le tableau précédent
-                    tbody.innerHTML = '';
-                    
-                    if (countSpan) {
+                    if (tbody) {
+                        tbody.innerHTML = '';
                         countSpan.textContent = data.length;
+                        
+                        if (data.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="6" style="padding:15px; text-align:center;">Aucun résultat trouvé.</td></tr>';
+                        } else {
+                            data.forEach(s => {
+                                // 1. Analyse dynamique des types de prises disponibles pour la ligne
+                                let listePrises = [];
+                                if (s.prise_ef == 1) listePrises.push("EF");
+                                if (s.prise_t2 == 1) listePrises.push("T2");
+                                if (s.prise_combo_ccs == 1) listePrises.push("CCS");
+                                if (s.prise_chademo == 1) listePrises.push("CHA");
+                                if (s.prise_autre == 1) listePrises.push("Autre");
+                                
+                                let prisesAffichees = listePrises.length > 0 ? listePrises.join(', ') : 'Inconnu';
+
+                                // 2. Nettoyage du texte de tarification
+                                let tarificationAffichee = s.tarification ? s.tarification : 'Non précisée';
+
+                                // 3. Détection du mode Admin
+                                const currentMode = localStorage.getItem('breizhwatt-mode') || 'user';
+                                const adminClass = (currentMode === 'admin') ? '' : 'hidden';
+
+                                // 4. Injection dans le tableau mis à jour (6 colonnes désormais)
+                                tbody.innerHTML += `<tr style="border-bottom: 1px solid #eee;">
+                                    <td style="padding:12px; font-weight: bold; color: #333;">${s.nom_station}</td>
+                                    <td style="padding:12px; color: #555;">${s.nom_amenageur_operateur || 'N/A'}</td>
+                                    <td style="padding:12px; font-size: 13px;"><strong>${s.nom_commune || ''}</strong><br>${s.adresse_station || ''}</td>
+                                    <td style="padding:12px;"><span style="background: #e3f2fd; color: #0d47a1; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${prisesAffichees}</span></td>
+                                    <td style="padding:12px; font-size: 13px; color: #666; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${tarificationAffichee}">${tarificationAffichee}</td>
+                                    <td style="padding:12px;" class="admin-only ${adminClass}">
+                                        <button class="btn-edit-station-trigger" data-id="${s.id_station_interne}" style="background-color: #29b6f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">✏️ Modifier</button>
+                                    </td>
+                                </tr>`;
+                            });
+                        }
+                        container.classList.remove('hidden');
+                        container.style.display = "block";
                     }
-
-                    if (data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="4" style="padding: 15px; text-align: center; color: #777;">Aucune borne ne correspond à ces critères.</td></tr>`;
-                    } else {
-                        // On boucle sur les lignes trouvées pour construire dynamiquement le tableau
-                        data.forEach(station => {
-                            const tr = document.createElement('tr');
-                            tr.style.borderBottom = "1px solid #eee";
-                            
-                            // Détection dynamique du mode actuel (admin ou user) pour afficher l'Action
-                            const currentMode = localStorage.getItem('breizhwatt-mode') || 'user';
-                            const adminClass = (currentMode === 'admin') ? '' : 'hidden';
-
-                            tr.innerHTML = `
-                                <td style="padding: 12px; font-weight: bold; color: #333;">${station.nom_station || 'Sans nom'}</td>
-                                <td style="padding: 12px; color: #555;">${station.nom_amenageur_operateur || 'Inconnu'}</td>
-                                <td style="padding: 12px; font-size: 13px; color: #666;"><strong>${station.nom_commune || ''}</strong><br>${station.adresse_station || ''}</td>
-                                <td style="padding: 12px;" class="admin-only ${adminClass}">
-                                    <button class="btn-edit-station-trigger" data-id="${station.id_station_interne}" style="background-color: #29b6f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">✏️ Modifier</button>
-                                </td>
-                            `;
-                            tbody.appendChild(tr);
-                        });
-                    }
-
-                    // Affichage explicite du container de résultats (retrait de la classe et force display)
-                    container.classList.remove('hidden');
-                    container.style.display = "block";
                 })
-                .catch(error => {
-                    alert("Erreur lors de la recherche : " + error.message);
-                    console.error(error);
-                });
+                .catch(e => console.error("Erreur lors de la recherche :", e));
         });
     }
 });
