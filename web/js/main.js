@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const scriptTag = document.getElementById('main-script');
 
     // Détection de la position physique du fichier PHP dans l'arborescence
-    // On se base sur data-location="backfolder" OU sur l'URL
     const isInsideBackFolder =
         (scriptTag && scriptTag.getAttribute('data-location') === 'backfolder') ||
         window.location.pathname.includes('/back/');
@@ -14,8 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const isBackOffice = scriptTag && scriptTag.getAttribute('data-mode') === 'admin';
 
     // Le chemin vers l'API dépend de l'emplacement physique du fichier PHP
-    // front (web/)      → api/
-    // back  (web/back/) → ../api/
     const apiPrefix = isInsideBackFolder ? '../api/' : 'api/';
 
     // --- GESTION DU SWITCHER DE MODE (HEADER) ---
@@ -55,11 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let markersGroup = L.layerGroup().addTo(map);
 
-        /**
-         * Charge les marqueurs depuis l'API selon les filtres sélectionnés.
-         * Les IDs des selects sont normalisés : #filter-annee et #filter-departement
-         * sur TOUTES les pages carte (front et back).
-         */
         function loadMarkers() {
             const annee       = document.getElementById('filter-annee')?.value       || '';
             const departement = document.getElementById('filter-departement')?.value  || '';
@@ -69,21 +61,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(stations => {
                     markersGroup.clearLayers();
 
-                    if (!Array.isArray(stations)) {
-                        console.error("Réponse API inattendue :", stations);
-                        return;
-                    }
+                    if (!Array.isArray(stations)) return;
 
                     stations.forEach(st => {
                         if (!st) return;
 
-                        // Les coordonnées proviennent des colonnes latitude / longitude
                         const lat = parseFloat(st.latitude);
                         const lon = parseFloat(st.longitude);
 
                         if (isNaN(lat) || isNaN(lon)) return;
 
-                        // Construction de la liste des prises disponibles
                         const listePrises = [];
                         if (parseInt(st.prise_ef)        === 1) listePrises.push('EF');
                         if (parseInt(st.prise_t2)        === 1) listePrises.push('T2');
@@ -95,11 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         const stationNom   = st.nom_station   || 'Station sans nom';
                         const stationAdresse = st.adresse_station || 'Adresse inconnue';
 
-                        // Lien vers la page détail (chemin relatif adapté selon le contexte)
-                        const detailUrl = isInsideBackFolder
-                            ? `../detail.php?id=${st.id_station_interne}`
-                            : `detail.php?id=${st.id_station_interne}`;
-
                         const popupContent = `
                             <div style="font-family: sans-serif; font-size: 13px; min-width: 200px;">
                                 <h4 style="margin: 0 0 6px 0; color: #0c1c3e;">${stationNom}</h4>
@@ -107,9 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <p style="margin: 3px 0;"><strong>⚡ Puissance :</strong> ${st.puissance_nominale || 'N/A'} kW</p>
                                 <p style="margin: 3px 0;"><strong>🔌 Prises :</strong> ${prisesText}</p>
                                 <p style="margin: 3px 0;"><strong>💰 Tarif :</strong> ${tarifText}</p>
-                                <p style="margin: 6px 0 0 0;">
-                                    <a href="${detailUrl}" style="color: #1565c0; font-weight: bold;">→ Voir le détail</a>
-                                </p>
                             </div>
                         `;
 
@@ -119,14 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 .catch(err => console.error('Erreur lors du chargement de la carte :', err));
         }
 
-        // Rechargement automatique dès qu'un filtre change
         document.getElementById('filter-annee')?.addEventListener('change', loadMarkers);
         document.getElementById('filter-departement')?.addEventListener('change', loadMarkers);
-
-        // Bouton "Filtrer les bornes" présent sur la page carte front
         document.getElementById('btn-filter-carte')?.addEventListener('click', loadMarkers);
 
-        // Chargement initial au démarrage
         loadMarkers();
     }
 
@@ -157,10 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (countSpan) countSpan.textContent = data.length;
 
-                    // En mode admin, on affiche la colonne Actions
-                    const colActions = document.querySelector('.col-actions');
-                    if (colActions) colActions.style.display = isBackOffice ? '' : 'none';
-
                     if (data.length === 0) {
                         tbody.innerHTML = '<tr><td colspan="6" style="padding:15px; text-align:center;">Aucun résultat trouvé.</td></tr>';
                     } else {
@@ -181,33 +152,34 @@ document.addEventListener('DOMContentLoaded', () => {
                             const sCommune    = s.nom_commune             || '';
                             const sAdresse    = s.adresse_station         || '';
 
-                            // Lien vers la page détail
-                            const detailUrl = isInsideBackFolder
-                                ? `../detail.php?id=${s.id_station_interne}`
-                                : `detail.php?id=${s.id_station_interne}`;
+                            // Construction de la cellule des actions (bouton détail visible pour tous)
+                            let actionCell = `
+                                <td style="padding:12px; display: flex; gap: 8px; align-items: center;">
+                                    <button class="btn-detail-trigger" data-id="${s.id_station_interne}" 
+                                        style="background-color: #4caf50; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                                        👁️ Détail
+                                    </button>
+                            `;
 
-                            let actionCell = '';
+                            // Ajout des boutons de modification uniquement en admin
                             if (isBackOffice) {
-                                actionCell = `
-                                    <td style="padding:12px; display: flex; gap: 8px; align-items: center;">
-                                        <button class="btn-edit-trigger" data-id="${s.id_station_interne}"
-                                            style="background-color:#29b6f6; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">
-                                            ✏️ Modifier
-                                        </button>
-                                        <button class="btn-delete-trigger" data-id="${s.id_station_interne}"
-                                            style="background-color:#ef5350; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:bold;"
-                                            title="Supprimer cette station">
-                                            🗑️
-                                        </button>
-                                    </td>
+                                actionCell += `
+                                    <button class="btn-edit-trigger" data-id="${s.id_station_interne}"
+                                        style="background-color:#29b6f6; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">
+                                        ✏️ Modifier
+                                    </button>
+                                    <button class="btn-delete-trigger" data-id="${s.id_station_interne}"
+                                        style="background-color:#ef5350; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:bold;"
+                                        title="Supprimer cette station">
+                                        🗑️
+                                    </button>
                                 `;
                             }
+                            actionCell += `</td>`;
 
                             tbody.innerHTML += `
                                 <tr style="border-bottom: 1px solid #eee;">
-                                    <td style="padding:12px; font-weight:bold; color:#333;">
-                                        <a href="${detailUrl}" style="color:#1565c0; text-decoration:none;">${sNom}</a>
-                                    </td>
+                                    <td style="padding:12px; font-weight:bold; color:#333;">${sNom}</td>
                                     <td style="padding:12px; color:#555;">${sAmenageur}</td>
                                     <td style="padding:12px; font-size:13px;"><strong>${sCommune}</strong><br>${sAdresse}</td>
                                     <td style="padding:12px;">
@@ -224,7 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     if (container) container.style.display = 'block';
-                    // Retire la classe hidden si présente (cas front)
                     if (container) container.classList.remove('hidden');
                 })
                 .catch(e => console.error('Erreur lors de la recherche :', e));
@@ -232,7 +203,62 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
-    // 4. FENÊTRE MODALE ADMIN : OUVERTURE & PRÉ-REMPLISSAGE
+    // 4. FENÊTRE MODALE : OUVERTURE DÉTAIL (NOUVEAU)
+    // =========================================================================
+    document.addEventListener('click', (e) => {
+        if (e.target && e.target.classList.contains('btn-detail-trigger')) {
+            const idStation = e.target.getAttribute('data-id');
+
+            // Appel à l'API pour récupérer toutes les infos
+            fetch(`${apiPrefix}get_station_details.php?id=${encodeURIComponent(idStation)}`)
+                .then(r => r.json())
+                .then(station => {
+                    if (!station || station.error) {
+                        alert("Erreur lors du chargement des détails.");
+                        return;
+                    }
+
+                    // Formatage des prises
+                    const listePrises = [];
+                    if (parseInt(station.prise_ef) === 1) listePrises.push('EF (Prise classique standard)');
+                    if (parseInt(station.prise_t2) === 1) listePrises.push('Type 2 (Borne AC Europe)');
+                    if (parseInt(station.prise_combo_ccs) === 1) listePrises.push('Combo CCS (Recharge rapide DC)');
+                    if (parseInt(station.prise_chademo) === 1) listePrises.push('CHAdeMO (Recharge rapide Asie)');
+                    if (parseInt(station.prise_autre) === 1) listePrises.push('Autre type de connecteur');
+
+                    const prisesText = listePrises.length > 0 ? listePrises.join('<br>• ') : 'Aucune précision';
+                    const tarifText = station.tarification || 'Non spécifié / Inconnu';
+                    const puissance = station.puissance_nominale ? station.puissance_nominale + ' kW' : 'Inconnue';
+
+                    // Création de l'affichage HTML
+                    const htmlInfos = `
+                        <p style="margin-bottom: 8px;"><strong>🏢 Nom :</strong> <span style="color:#2b6cb0; font-weight:bold;">${station.nom_station || 'Inconnu'}</span></p>
+                        <p style="margin-bottom: 8px;"><strong>📍 Adresse :</strong> ${station.adresse_station || 'Inconnue'}</p>
+                        <p style="margin-bottom: 8px;"><strong>🌍 Coordonnées GPS :</strong> <code>${station.latitude || 'N/A'}, ${station.longitude || 'N/A'}</code></p>
+                        <p style="margin-bottom: 8px;"><strong>⚡ Puissance Max :</strong> <span style="background:#edf2f7; padding:2px 6px; border-radius:4px; font-weight:bold;">${puissance}</span></p>
+                        <p style="margin-bottom: 8px; border-top: 1px solid #e2e8f0; padding-top: 8px;"><strong>💰 Tarification :</strong><br><span style="font-size:13px; color:#4a5568;">${tarifText}</span></p>
+                        <p style="margin-bottom: 8px; border-top: 1px solid #e2e8f0; padding-top: 8px;"><strong>🔌 Connecteurs :</strong><br>• ${prisesText}</p>
+                    `;
+
+                    // Injection dans la page et affichage
+                    const conteneurDetail = document.getElementById('detail-content');
+                    if (conteneurDetail) conteneurDetail.innerHTML = htmlInfos;
+
+                    const modalDetail = document.getElementById('modal-detail');
+                    if (modalDetail) modalDetail.style.display = 'flex';
+                })
+                .catch(err => console.error("Erreur popup détail :", err));
+        }
+    });
+
+    // Fermeture de la fenêtre Détail
+    document.getElementById('btn-close-detail')?.addEventListener('click', () => {
+        const modalDetail = document.getElementById('modal-detail');
+        if (modalDetail) modalDetail.style.display = 'none';
+    });
+
+    // =========================================================================
+    // 5. FENÊTRE MODALE ADMIN : ÉDITION ET SUPPRESSION
     // =========================================================================
     document.addEventListener('click', (e) => {
         if (e.target && e.target.classList.contains('btn-edit-trigger')) {
@@ -264,13 +290,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Fermeture de la modale
     document.getElementById('btn-close-modal')?.addEventListener('click', () => {
         const modal = document.getElementById('modal-edit');
         if (modal) modal.style.display = 'none';
     });
 
-    // Soumission du formulaire de modification
     document.getElementById('form-edit-station')?.addEventListener('submit', (e) => {
         e.preventDefault();
         const form = e.target;
@@ -297,7 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('✅ Station modifiée avec succès !');
                 const modal = document.getElementById('modal-edit');
                 if (modal) modal.style.display = 'none';
-                document.getElementById('btn-search')?.click(); // Rafraîchit le tableau
+                document.getElementById('btn-search')?.click();
             } else {
                 alert('❌ Erreur : ' + (result?.error || 'Inconnue'));
             }
@@ -305,9 +329,6 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(err => alert('Erreur réseau lors de la modification : ' + err.message));
     });
 
-    // =========================================================================
-    // 5. ACTION DE SUPPRESSION ADMIN
-    // =========================================================================
     document.addEventListener('click', (e) => {
         if (e.target && e.target.classList.contains('btn-delete-trigger')) {
             const idStation = e.target.getAttribute('data-id');

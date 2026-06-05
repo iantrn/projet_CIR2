@@ -96,7 +96,7 @@ try {
                     <th style="padding: 12px;">Commune / Adresse</th>
                     <th style="padding: 12px;">Prises</th>
                     <th style="padding: 12px;">Tarification</th>
-                    <th style="padding: 12px; display:none;" class="col-actions">Actions</th>
+                    <th style="padding: 12px;" class="col-actions">Actions</th>
                 </tr>
             </thead>
             <tbody id="search-table-body"></tbody>
@@ -104,11 +104,22 @@ try {
     </div>
 </div>
 
+<div id="modal-detail" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 9999;">
+    <div style="background: white; padding: 25px; border-radius: 12px; max-width: 500px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-family: sans-serif; max-height: 90vh; overflow-y: auto;">
+        <h3 style="margin-top: 0; border-bottom: 2px solid #3498db; padding-bottom: 10px; color: #0c1c3e;">👁️ Détails de la borne</h3>
+        
+        <div id="detail-content" style="margin-top: 15px; font-size: 14px; line-height: 1.6; color: #333;">
+            <p>Chargement des informations...</p>
+        </div>
+        
+        <button id="btn-close-detail" style="margin-top: 20px; width: 100%; padding: 10px; background: #3498db; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">Fermer</button>
+    </div>
+</div>
+
 <footer class="footer-user">
   <p>© 2026 - Espace Public CIR2 Gabriel T, Ian T</p>
 </footer>
 
-<!-- id="main-script" sans data-mode="admin" → mode lecture seule -->
 <script src="js/main.js?v=2" id="main-script" data-location="frontfolder"></script>
 </body>
 </html>
