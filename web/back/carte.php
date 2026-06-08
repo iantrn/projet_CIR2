@@ -80,6 +80,7 @@ try {
     </div>
 </div>
 
+
 <footer class="footer-admin">
   <p>© 2026 - Espace Privé CIR2 Gabriel T, Ian T</p>
 </footer>

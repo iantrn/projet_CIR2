@@ -203,41 +203,75 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
-    // 4. FENÊTRE MODALE : OUVERTURE DÉTAIL (NOUVEAU)
+    // 4. FENÊTRE MODALE : OUVERTURE DÉTAIL (VERSION ULTRA-COMPLÈTE)
     // =========================================================================
     document.addEventListener('click', (e) => {
         if (e.target && e.target.classList.contains('btn-detail-trigger')) {
             const idStation = e.target.getAttribute('data-id');
 
-            // Appel à l'API pour récupérer toutes les infos
+            // Appel à l'API pour récupérer TOUTES les infos
             fetch(`${apiPrefix}get_station_details.php?id=${encodeURIComponent(idStation)}`)
                 .then(r => r.json())
                 .then(station => {
                     if (!station || station.error) {
-                        alert("Erreur lors du chargement des détails.");
+                        alert("Erreur lors du chargement des détails : " + (station?.error || "Inconnue"));
                         return;
                     }
 
                     // Formatage des prises
                     const listePrises = [];
-                    if (parseInt(station.prise_ef) === 1) listePrises.push('EF (Prise classique standard)');
-                    if (parseInt(station.prise_t2) === 1) listePrises.push('Type 2 (Borne AC Europe)');
-                    if (parseInt(station.prise_combo_ccs) === 1) listePrises.push('Combo CCS (Recharge rapide DC)');
-                    if (parseInt(station.prise_chademo) === 1) listePrises.push('CHAdeMO (Recharge rapide Asie)');
+                    if (parseInt(station.prise_ef) === 1) listePrises.push('EF (Prise Domestique)');
+                    if (parseInt(station.prise_t2) === 1) listePrises.push('Type 2 (Standard AC)');
+                    if (parseInt(station.prise_combo_ccs) === 1) listePrises.push('Combo CCS (Recharge Rapide DC)');
+                    if (parseInt(station.prise_chademo) === 1) listePrises.push('CHAdeMO (Recharge Rapide DC)');
                     if (parseInt(station.prise_autre) === 1) listePrises.push('Autre type de connecteur');
-
                     const prisesText = listePrises.length > 0 ? listePrises.join('<br>• ') : 'Aucune précision';
-                    const tarifText = station.tarification || 'Non spécifié / Inconnu';
-                    const puissance = station.puissance_nominale ? station.puissance_nominale + ' kW' : 'Inconnue';
 
-                    // Création de l'affichage HTML
+                    // Formatage des booléens (Oui/Non)
+                    const isGratuit = parseInt(station.gratuit) === 1 ? '<span style="color:green; font-weight:bold;">Oui ✅</span>' : 'Non ❌';
+                    const isCB = parseInt(station.paiement_cb) === 1 ? 'Oui ✅' : 'Non ❌';
+                    const isActe = parseInt(station.paiment_acte) === 1 ? 'Oui ✅' : 'Non ❌';
+                    const isAutrePaiement = parseInt(station.paiement_autre) === 1 ? 'Oui ✅' : 'Non ❌';
+                    const hasCable = parseInt(station.cable_t2_attache) === 1 ? 'Oui (Prêt à l\'emploi) ✅' : 'Non (Apportez votre câble) ❌';
+
+                    // Création de l'affichage HTML structuré en blocs
                     const htmlInfos = `
-                        <p style="margin-bottom: 8px;"><strong>🏢 Nom :</strong> <span style="color:#2b6cb0; font-weight:bold;">${station.nom_station || 'Inconnu'}</span></p>
-                        <p style="margin-bottom: 8px;"><strong>📍 Adresse :</strong> ${station.adresse_station || 'Inconnue'}</p>
-                        <p style="margin-bottom: 8px;"><strong>🌍 Coordonnées GPS :</strong> <code>${station.latitude || 'N/A'}, ${station.longitude || 'N/A'}</code></p>
-                        <p style="margin-bottom: 8px;"><strong>⚡ Puissance Max :</strong> <span style="background:#edf2f7; padding:2px 6px; border-radius:4px; font-weight:bold;">${puissance}</span></p>
-                        <p style="margin-bottom: 8px; border-top: 1px solid #e2e8f0; padding-top: 8px;"><strong>💰 Tarification :</strong><br><span style="font-size:13px; color:#4a5568;">${tarifText}</span></p>
-                        <p style="margin-bottom: 8px; border-top: 1px solid #e2e8f0; padding-top: 8px;"><strong>🔌 Connecteurs :</strong><br>• ${prisesText}</p>
+                        <div style="margin-bottom: 15px; background: #f8fafc; padding: 10px; border-radius: 8px; border-left: 4px solid #3498db;">
+                            <h4 style="margin: 0 0 5px 0; color: #1e3a8a;">📍 Localisation & Identité</h4>
+                            <p style="margin: 3px 0;"><strong>Nom :</strong> ${station.nom_station || 'Inconnu'}</p>
+                            <p style="margin: 3px 0;"><strong>Enseigne :</strong> ${station.nom_enseigne || 'Non spécifiée'}</p>
+                            <p style="margin: 3px 0;"><strong>Implantation :</strong> ${station.libelle_implantation || 'Non spécifiée'}</p>
+                            <p style="margin: 3px 0;"><strong>Adresse :</strong> ${station.adresse_station || ''}, ${station.code_postal || ''} ${station.nom_commune || ''}</p>
+                            <p style="margin: 3px 0;"><strong>Département :</strong> ${station.nom_dep || ''} (${station.code_dep || ''})</p>
+                            <p style="margin: 3px 0;"><strong>GPS :</strong> <code>${station.latitude || 'N/A'}, ${station.longitude || 'N/A'}</code></p>
+                            <p style="margin: 3px 0;"><strong>IDs (Itinérance / Local) :</strong> <code>${station.id_station_itinerance || 'N/A'}</code> / <code>${station.id_station_local || 'N/A'}</code></p>
+                        </div>
+
+                        <div style="margin-bottom: 15px; background: #f0fdf4; padding: 10px; border-radius: 8px; border-left: 4px solid #10b981;">
+                            <h4 style="margin: 0 0 5px 0; color: #065f46;">⚡ Détails Techniques</h4>
+                            <p style="margin: 3px 0;"><strong>Puissance Maximale :</strong> ${station.puissance_nominale ? station.puissance_nominale + ' kW' : 'Inconnue'}</p>
+                            <p style="margin: 3px 0;"><strong>Câble T2 attaché :</strong> ${hasCable}</p>
+                            <p style="margin: 3px 0;"><strong>Raccordement :</strong> ${station.libelle_raccordement || 'Inconnu'}</p>
+                            <p style="margin: 3px 0;"><strong>Mise en service :</strong> ${station.date_mise_en_service || 'Inconnue'}</p>
+                            <p style="margin: 5px 0 2px 0;"><strong>Connecteurs disponibles :</strong><br>• ${prisesText}</p>
+                        </div>
+
+                        <div style="margin-bottom: 15px; background: #fffbeb; padding: 10px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                            <h4 style="margin: 0 0 5px 0; color: #92400e;">💰 Tarification & Accès</h4>
+                            <p style="margin: 3px 0;"><strong>Horaires :</strong> ${station.libelle_horaires || 'Non spécifiés'}</p>
+                            <p style="margin: 3px 0;"><strong>Conditions d'accès :</strong> ${station.libelle_condition_acces || 'Non spécifiées'}</p>
+                            <p style="margin: 3px 0;"><strong>Recharge Gratuite :</strong> ${isGratuit}</p>
+                            <p style="margin: 3px 0;"><strong>Paiement à l'acte :</strong> ${isActe} | <strong>Carte Bancaire (CB) :</strong> ${isCB} | <strong>Autre :</strong> ${isAutrePaiement}</p>
+                            <p style="margin: 3px 0;"><strong>Détails Tarifs :</strong> <span style="font-size: 13px; color: #4b5563;">${station.tarification || 'Non communiqué'}</span></p>
+                        </div>
+
+                        <div style="margin-bottom: 5px; background: #f3f4f6; padding: 10px; border-radius: 8px; border-left: 4px solid #6b7280;">
+                            <h4 style="margin: 0 0 5px 0; color: #374151;">🛠️ Opérateur & Assistance</h4>
+                            <p style="margin: 3px 0;"><strong>Aménageur :</strong> ${station.nom_amenageur_operateur || 'Inconnu'}</p>
+                            <p style="margin: 3px 0;"><strong>Téléphone Opérateur :</strong> ${station.telephone_operateur || 'Non renseigné'}</p>
+                            <p style="margin: 3px 0;"><strong>Contact Opérateur :</strong> ${station.contact_operateur || 'Non renseigné'}</p>
+                            <p style="margin: 3px 0;"><strong>Contact Aménageur :</strong> ${station.contact_amenageur || 'Non renseigné'}</p>
+                        </div>
                     `;
 
                     // Injection dans la page et affichage
