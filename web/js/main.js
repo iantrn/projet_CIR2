@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
-    // 2. INITIALISATION DE LA CARTE LEAFLET
+    // 2. INITIALISATION DE LA CARTE LEAFLET (AVEC LIEN DÉTAILS)
     // =========================================================================
     const mapElement = document.getElementById('map');
     if (mapElement) {
@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const stationNom   = st.nom_station   || 'Station sans nom';
                         const stationAdresse = st.adresse_station || 'Adresse inconnue';
 
+                        // MODIFIÉ : Ajout du lien hypertexte "btn-detail-trigger" dans la popup Leaflet
                         const popupContent = `
                             <div style="font-family: sans-serif; font-size: 13px; min-width: 200px;">
                                 <h4 style="margin: 0 0 6px 0; color: #0c1c3e;">${stationNom}</h4>
@@ -89,6 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <p style="margin: 3px 0;"><strong>⚡ Puissance :</strong> ${st.puissance_nominale || 'N/A'} kW</p>
                                 <p style="margin: 3px 0;"><strong>🔌 Prises :</strong> ${prisesText}</p>
                                 <p style="margin: 3px 0;"><strong>💰 Tarif :</strong> ${tarifText}</p>
+                                <hr style="border:0; border-top:1px solid #eee; margin:8px 0;">
+                                <a href="#" class="btn-detail-trigger" data-id="${st.id_station_interne}" style="color:#3498db; font-weight:bold; text-decoration:none; display:inline-block;">👁️ Voir tous les détails</a>
                             </div>
                         `;
 
@@ -106,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
-    // 3. GESTION DE LA RECHERCHE ET DU TABLEAU DYNAMIQUE
+    // 3. GESTION DE LA RECHERCHE ET DU TABLEAU DYNAMIQUE (USER & BACKOFFICE)
     // =========================================================================
     const btnSearchPage = document.getElementById('btn-search');
     if (btnSearchPage) {
@@ -152,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             const sCommune    = s.nom_commune             || '';
                             const sAdresse    = s.adresse_station         || '';
 
-                            // Construction de la cellule des actions (bouton détail visible pour tous)
+                            // MODIFIÉ : Le bouton vert "Détail" est maintenant inclus POUR TOUT LE MONDE (User ET Admin)
                             let actionCell = `
                                 <td style="padding:12px; display: flex; gap: 8px; align-items: center;">
                                     <button class="btn-detail-trigger" data-id="${s.id_station_interne}" 
@@ -161,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </button>
                             `;
 
-                            // Ajout des boutons de modification uniquement en admin
+                            // Ajout additionnel des boutons de modification uniquement en admin
                             if (isBackOffice) {
                                 actionCell += `
                                     <button class="btn-edit-trigger" data-id="${s.id_station_interne}"
@@ -203,10 +206,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
-    // 4. FENÊTRE MODALE : OUVERTURE DÉTAIL (VERSION ULTRA-COMPLÈTE)
+    // 4. FENÊTRE MODALE : OUVERTURE DÉTAIL GLOBAL (TABLEAU + CARTE)
     // =========================================================================
     document.addEventListener('click', (e) => {
         if (e.target && e.target.classList.contains('btn-detail-trigger')) {
+            // Empêche le comportement par défaut si c'est une balise <a> sur la carte
+            if(e.target.tagName === 'A') { e.preventDefault(); }
+            
             const idStation = e.target.getAttribute('data-id');
 
             // Appel à l'API pour récupérer TOUTES les infos
@@ -244,7 +250,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p style="margin: 3px 0;"><strong>Adresse :</strong> ${station.adresse_station || ''}, ${station.code_postal || ''} ${station.nom_commune || ''}</p>
                             <p style="margin: 3px 0;"><strong>Département :</strong> ${station.nom_dep || ''} (${station.code_dep || ''})</p>
                             <p style="margin: 3px 0;"><strong>GPS :</strong> <code>${station.latitude || 'N/A'}, ${station.longitude || 'N/A'}</code></p>
-                            <p style="margin: 3px 0;"><strong>IDs (Itinérance / Local) :</strong> <code>${station.id_station_itinerance || 'N/A'}</code> / <code>${station.id_station_local || 'N/A'}</code></p>
                         </div>
 
                         <div style="margin-bottom: 15px; background: #f0fdf4; padding: 10px; border-radius: 8px; border-left: 4px solid #10b981;">
@@ -270,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p style="margin: 3px 0;"><strong>Aménageur :</strong> ${station.nom_amenageur_operateur || 'Inconnu'}</p>
                             <p style="margin: 3px 0;"><strong>Téléphone Opérateur :</strong> ${station.telephone_operateur || 'Non renseigné'}</p>
                             <p style="margin: 3px 0;"><strong>Contact Opérateur :</strong> ${station.contact_operateur || 'Non renseigné'}</p>
-                            <p style="margin: 3px 0;"><strong>Contact Aménageur :</strong> ${station.contact_amenageur || 'Non renseigné'}</p>
                         </div>
                     `;
 
