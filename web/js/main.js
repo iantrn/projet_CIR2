@@ -1,21 +1,19 @@
-// =========================================================================
-// 1. Initialisation, Détection du Contexte et Gestion du Mode (Header)
-// =========================================================================
+// Attente du chargement complet du DOM
 document.addEventListener('DOMContentLoaded', () => {
     const scriptTag = document.getElementById('main-script');
 
-    // Détection de la position physique du fichier PHP dans l'arborescence
+    // On vérifie si on est dans le dossier /back/ pour adapter les chemins
     const isInsideBackFolder =
         (scriptTag && scriptTag.getAttribute('data-location') === 'backfolder') ||
         window.location.pathname.includes('/back/');
 
-    // data-mode="admin" → on est en back-office (actions CRUD activées)
+    // Mode admin actif si l'attribut est à "admin"
     const isBackOffice = scriptTag && scriptTag.getAttribute('data-mode') === 'admin';
 
-    // Le chemin vers l'API dépend de l'emplacement physique du fichier PHP
+    // Préfixe pour appeler les fichiers de l'API
     const apiPrefix = isInsideBackFolder ? '../api/' : 'api/';
 
-    // --- GESTION DU SWITCHER DE MODE (HEADER) ---
+    // --- Gestion du changement de mode (User / Admin) ---
     const btnModeUser  = document.getElementById('btn-mode-user');
     const btnModeAdmin = document.getElementById('btn-mode-admin');
 
@@ -39,11 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // =========================================================================
-    // 2. INITIALISATION DE LA CARTE LEAFLET (AVEC LIEN DÉTAILS)
-    // =========================================================================
+    // --- Gestion de la carte Leaflet ---
     const mapElement = document.getElementById('map');
     if (mapElement) {
+        // Centrage de la carte sur la Bretagne
         const map = L.map('map').setView([48.2020, -2.9326], 8);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -52,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let markersGroup = L.layerGroup().addTo(map);
 
+        // Fonction pour charger les marqueurs avec les filtres
         function loadMarkers() {
             const annee       = document.getElementById('filter-annee')?.value       || '';
             const departement = document.getElementById('filter-departement')?.value  || '';
@@ -71,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         if (isNaN(lat) || isNaN(lon)) return;
 
+                        // Vérification des types de prises dispo
                         const listePrises = [];
                         if (parseInt(st.prise_ef)        === 1) listePrises.push('EF');
                         if (parseInt(st.prise_t2)        === 1) listePrises.push('T2');
@@ -82,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const stationNom   = st.nom_station   || 'Station sans nom';
                         const stationAdresse = st.adresse_station || 'Adresse inconnue';
 
-                        // MODIFIÉ : Ajout du lien hypertexte "btn-detail-trigger" dans la popup Leaflet
+                        // Code HTML de la bulle (popup) avec le lien de détail
                         const popupContent = `
                             <div style="font-family: sans-serif; font-size: 13px; min-width: 200px;">
                                 <h4 style="margin: 0 0 6px 0; color: #0c1c3e;">${stationNom}</h4>
@@ -98,9 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         L.marker([lat, lon]).bindPopup(popupContent).addTo(markersGroup);
                     });
                 })
-                .catch(err => console.error('Erreur lors du chargement de la carte :', err));
+                .catch(err => console.error('Erreur chargement marqueurs :', err));
         }
 
+        // Ecouteurs sur les filtres de la carte
         document.getElementById('filter-annee')?.addEventListener('change', loadMarkers);
         document.getElementById('filter-departement')?.addEventListener('change', loadMarkers);
         document.getElementById('btn-filter-carte')?.addEventListener('click', loadMarkers);
@@ -108,9 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadMarkers();
     }
 
-    // =========================================================================
-    // 3. GESTION DE LA RECHERCHE ET DU TABLEAU DYNAMIQUE (USER & BACKOFFICE)
-    // =========================================================================
+    // --- Gestion de la recherche et du tableau ---
     const btnSearchPage = document.getElementById('btn-search');
     if (btnSearchPage) {
         btnSearchPage.addEventListener('click', () => {
@@ -118,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const typePrise   = document.getElementById('type_prise')?.value   || '';
             const departement = document.getElementById('departement')?.value  || '';
 
+            // Requête AJAX pour chercher les stations
             fetch(`${apiPrefix}search_stations.php?amenageur=${encodeURIComponent(amenageur)}&type_prise=${encodeURIComponent(typePrise)}&departement=${encodeURIComponent(departement)}`)
                 .then(r => r.json())
                 .then(data => {
@@ -138,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (data.length === 0) {
                         tbody.innerHTML = '<tr><td colspan="6" style="padding:15px; text-align:center;">Aucun résultat trouvé.</td></tr>';
                     } else {
+                        // Remplissage du tableau de recherche
                         data.forEach(s => {
                             if (!s) return;
 
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             const sCommune    = s.nom_commune             || '';
                             const sAdresse    = s.adresse_station         || '';
 
-                            // MODIFIÉ : Le bouton vert "Détail" est maintenant inclus POUR TOUT LE MONDE (User ET Admin)
+                            // Bouton Détail visible pour tout le monde
                             let actionCell = `
                                 <td style="padding:12px; display: flex; gap: 8px; align-items: center;">
                                     <button class="btn-detail-trigger" data-id="${s.id_station_interne}" 
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </button>
                             `;
 
-                            // Ajout additionnel des boutons de modification uniquement en admin
+                            // Si on est admin, on ajoute Modif et Suppr
                             if (isBackOffice) {
                                 actionCell += `
                                     <button class="btn-edit-trigger" data-id="${s.id_station_interne}"
@@ -198,49 +198,46 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     }
 
-                    if (container) container.style.display = 'block';
-                    if (container) container.classList.remove('hidden');
+                    if (container) {
+                        container.style.display = 'block';
+                        container.classList.remove('hidden');
+                    }
                 })
-                .catch(e => console.error('Erreur lors de la recherche :', e));
+                .catch(e => console.error('Erreur recherche :', e));
         });
     }
 
-    // =========================================================================
-    // 4. FENÊTRE MODALE : OUVERTURE DÉTAIL GLOBAL (TABLEAU + CARTE)
-    // =========================================================================
+    // --- Gestion de la modale de Détails ---
     document.addEventListener('click', (e) => {
         if (e.target && e.target.classList.contains('btn-detail-trigger')) {
-            // Empêche le comportement par défaut si c'est une balise <a> sur la carte
             if(e.target.tagName === 'A') { e.preventDefault(); }
             
             const idStation = e.target.getAttribute('data-id');
 
-            // Appel à l'API pour récupérer TOUTES les infos
+            // Récupération des infos complètes de la station
             fetch(`${apiPrefix}get_station_details.php?id=${encodeURIComponent(idStation)}`)
                 .then(r => r.json())
                 .then(station => {
                     if (!station || station.error) {
-                        alert("Erreur lors du chargement des détails : " + (station?.error || "Inconnue"));
+                        alert("Erreur chargement détails : " + (station?.error || "Inconnue"));
                         return;
                     }
 
-                    // Formatage des prises
                     const listePrises = [];
                     if (parseInt(station.prise_ef) === 1) listePrises.push('EF (Prise Domestique)');
                     if (parseInt(station.prise_t2) === 1) listePrises.push('Type 2 (Standard AC)');
-                    if (parseInt(station.prise_combo_ccs) === 1) listePrises.push('Combo CCS (Recharge Rapide DC)');
-                    if (parseInt(station.prise_chademo) === 1) listePrises.push('CHAdeMO (Recharge Rapide DC)');
+                    if (parseInt(station.prise_combo_ccs) === 1) listePrises.push('Combo CCS (Rapide DC)');
+                    if (parseInt(station.prise_chademo) === 1) listePrises.push('CHAdeMO (Rapide DC)');
                     if (parseInt(station.prise_autre) === 1) listePrises.push('Autre type de connecteur');
                     const prisesText = listePrises.length > 0 ? listePrises.join('<br>• ') : 'Aucune précision';
 
-                    // Formatage des booléens (Oui/Non)
                     const isGratuit = parseInt(station.gratuit) === 1 ? '<span style="color:green; font-weight:bold;">Oui ✅</span>' : 'Non ❌';
                     const isCB = parseInt(station.paiement_cb) === 1 ? 'Oui ✅' : 'Non ❌';
                     const isActe = parseInt(station.paiment_acte) === 1 ? 'Oui ✅' : 'Non ❌';
                     const isAutrePaiement = parseInt(station.paiement_autre) === 1 ? 'Oui ✅' : 'Non ❌';
-                    const hasCable = parseInt(station.cable_t2_attache) === 1 ? 'Oui (Prêt à l\'emploi) ✅' : 'Non (Apportez votre câble) ❌';
+                    const hasCable = parseInt(station.cable_t2_attache) === 1 ? 'Oui (Avec câble) ✅' : 'Non (Sans câble) ❌';
 
-                    // Création de l'affichage HTML structuré en blocs
+                    // Remplissage du template HTML de la modale
                     const htmlInfos = `
                         <div style="margin-bottom: 15px; background: #f8fafc; padding: 10px; border-radius: 8px; border-left: 4px solid #3498db;">
                             <h4 style="margin: 0 0 5px 0; color: #1e3a8a;">📍 Localisation & Identité</h4>
@@ -254,50 +251,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         <div style="margin-bottom: 15px; background: #f0fdf4; padding: 10px; border-radius: 8px; border-left: 4px solid #10b981;">
                             <h4 style="margin: 0 0 5px 0; color: #065f46;">⚡ Détails Techniques</h4>
-                            <p style="margin: 3px 0;"><strong>Puissance Maximale :</strong> ${station.puissance_nominale ? station.puissance_nominale + ' kW' : 'Inconnue'}</p>
+                            <p style="margin: 3px 0;"><strong>Puissance :</strong> ${station.puissance_nominale ? station.puissance_nominale + ' kW' : 'Inconnue'}</p>
                             <p style="margin: 3px 0;"><strong>Câble T2 attaché :</strong> ${hasCable}</p>
                             <p style="margin: 3px 0;"><strong>Raccordement :</strong> ${station.libelle_raccordement || 'Inconnu'}</p>
                             <p style="margin: 3px 0;"><strong>Mise en service :</strong> ${station.date_mise_en_service || 'Inconnue'}</p>
-                            <p style="margin: 5px 0 2px 0;"><strong>Connecteurs disponibles :</strong><br>• ${prisesText}</p>
+                            <p style="margin: 5px 0 2px 0;"><strong>Prises dispo :</strong><br>• ${prisesText}</p>
                         </div>
 
                         <div style="margin-bottom: 15px; background: #fffbeb; padding: 10px; border-radius: 8px; border-left: 4px solid #f59e0b;">
                             <h4 style="margin: 0 0 5px 0; color: #92400e;">💰 Tarification & Accès</h4>
                             <p style="margin: 3px 0;"><strong>Horaires :</strong> ${station.libelle_horaires || 'Non spécifiés'}</p>
-                            <p style="margin: 3px 0;"><strong>Conditions d'accès :</strong> ${station.libelle_condition_acces || 'Non spécifiées'}</p>
-                            <p style="margin: 3px 0;"><strong>Recharge Gratuite :</strong> ${isGratuit}</p>
-                            <p style="margin: 3px 0;"><strong>Paiement à l'acte :</strong> ${isActe} | <strong>Carte Bancaire (CB) :</strong> ${isCB} | <strong>Autre :</strong> ${isAutrePaiement}</p>
-                            <p style="margin: 3px 0;"><strong>Détails Tarifs :</strong> <span style="font-size: 13px; color: #4b5563;">${station.tarification || 'Non communiqué'}</span></p>
+                            <p style="margin: 3px 0;"><strong>Conditions :</strong> ${station.libelle_condition_acces || 'Non spécifiées'}</p>
+                            <p style="margin: 3px 0;"><strong>Gratuit :</strong> ${isGratuit}</p>
+                            <p style="margin: 3px 0;"><strong>Paiement acte :</strong> ${isActe} | <strong>CB :</strong> ${isCB} | <strong>Autre :</strong> ${isAutrePaiement}</p>
+                            <p style="margin: 3px 0;"><strong>Tarifs :</strong> <span style="font-size: 13px; color: #4b5563;">${station.tarification || 'Non communiqué'}</span></p>
                         </div>
 
                         <div style="margin-bottom: 5px; background: #f3f4f6; padding: 10px; border-radius: 8px; border-left: 4px solid #6b7280;">
-                            <h4 style="margin: 0 0 5px 0; color: #374151;">🛠️ Opérateur & Assistance</h4>
+                            <h4 style="margin: 0 0 5px 0; color: #374151;">🛠️ Opérateur</h4>
                             <p style="margin: 3px 0;"><strong>Aménageur :</strong> ${station.nom_amenageur_operateur || 'Inconnu'}</p>
-                            <p style="margin: 3px 0;"><strong>Téléphone Opérateur :</strong> ${station.telephone_operateur || 'Non renseigné'}</p>
-                            <p style="margin: 3px 0;"><strong>Contact Opérateur :</strong> ${station.contact_operateur || 'Non renseigné'}</p>
+                            <p style="margin: 3px 0;"><strong>Téléphone :</strong> ${station.telephone_operateur || 'Non renseigné'}</p>
+                            <p style="margin: 3px 0;"><strong>Contact :</strong> ${station.contact_operateur || 'Non renseigné'}</p>
                         </div>
                     `;
 
-                    // Injection dans la page et affichage
                     const conteneurDetail = document.getElementById('detail-content');
                     if (conteneurDetail) conteneurDetail.innerHTML = htmlInfos;
 
                     const modalDetail = document.getElementById('modal-detail');
                     if (modalDetail) modalDetail.style.display = 'flex';
                 })
-                .catch(err => console.error("Erreur popup détail :", err));
+                .catch(err => console.error("Erreur modale détail :", err));
         }
     });
 
-    // Fermeture de la fenêtre Détail
+    // Fermeture de la modale détail
     document.getElementById('btn-close-detail')?.addEventListener('click', () => {
         const modalDetail = document.getElementById('modal-detail');
         if (modalDetail) modalDetail.style.display = 'none';
     });
 
-    // =========================================================================
-    // 5. FENÊTRE MODALE ADMIN : ÉDITION ET SUPPRESSION
-    // =========================================================================
+    // --- Gestion de la modale d'édition (Admin uniquement) ---
     document.addEventListener('click', (e) => {
         if (e.target && e.target.classList.contains('btn-edit-trigger')) {
             const idStation = e.target.getAttribute('data-id');
@@ -310,6 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
                     const setCheck = (id, val) => { const el = document.getElementById(id); if (el) el.checked = (parseInt(val) === 1); };
 
+                    // Remplissage du formulaire d'édition
                     set('edit-id-station',  station.id_station_interne);
                     set('edit-nom',         station.nom_station);
                     set('edit-adresse',     station.adresse_station);
@@ -324,15 +319,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     const modal = document.getElementById('modal-edit');
                     if (modal) modal.style.display = 'flex';
                 })
-                .catch(err => alert("Erreur d'acquisition des données : " + err.message));
+                .catch(err => alert("Erreur récupération données : " + err.message));
         }
     });
 
+    // Fermeture modale édition
     document.getElementById('btn-close-modal')?.addEventListener('click', () => {
         const modal = document.getElementById('modal-edit');
         if (modal) modal.style.display = 'none';
     });
 
+    // Envoi du formulaire d'édition modifié
     document.getElementById('form-edit-station')?.addEventListener('submit', (e) => {
         e.preventDefault();
         const form = e.target;
@@ -356,22 +353,23 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(r => r.json())
         .then(result => {
             if (result && result.success) {
-                alert('✅ Station modifiée avec succès !');
+                alert('✅ Station modifiée !');
                 const modal = document.getElementById('modal-edit');
                 if (modal) modal.style.display = 'none';
-                document.getElementById('btn-search')?.click();
+                document.getElementById('btn-search')?.click(); // On rafraîchit la recherche
             } else {
                 alert('❌ Erreur : ' + (result?.error || 'Inconnue'));
             }
         })
-        .catch(err => alert('Erreur réseau lors de la modification : ' + err.message));
+        .catch(err => alert('Erreur réseau modif : ' + err.message));
     });
 
+    // --- Suppression d'une station (Admin uniquement) ---
     document.addEventListener('click', (e) => {
         if (e.target && e.target.classList.contains('btn-delete-trigger')) {
             const idStation = e.target.getAttribute('data-id');
 
-            if (confirm('⚠️ Êtes-vous sûr de vouloir supprimer définitivement cette station et tous ses points de recharge ?')) {
+            if (confirm('⚠️ Supprimer définitivement cette station et ses points de recharge ?')) {
                 fetch(`${apiPrefix}delete_station.php`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -380,64 +378,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(r => r.json())
                 .then(result => {
                     if (result && result.success) {
-                        alert('✅ La station a été supprimée avec succès !');
-                        document.getElementById('btn-search')?.click();
+                        alert('✅ Station supprimée !');
+                        document.getElementById('btn-search')?.click(); // On rafraîchit
                     } else {
                         alert('❌ Erreur : ' + (result?.error || 'Inconnue'));
                     }
                 })
-                .catch(err => alert('Erreur réseau lors de la suppression : ' + err.message));
+                .catch(err => alert('Erreur réseau suppr : ' + err.message));
             }
         }
     });
-    // =========================================================================
-    // GESTION DU FORMULAIRE ET DE LA MODALE D'AJOUT DE STATION
-    // =========================================================================
-    const modalAdd = document.getElementById('modal-add');
-    const btnOpenAdd = document.getElementById('btn-open-add-modal');
-    const btnCloseAdd = document.getElementById('btn-close-add');
-    const formAdd = document.getElementById('form-add-station');
-
-    // Ouverture de la modale d'ajout
-    if (btnOpenAdd && modalAdd) {
-        btnOpenAdd.addEventListener('click', () => {
-            formAdd.reset(); // Réinitialise le formulaire à chaque ouverture
-            modalAdd.style.display = 'flex';
-        });
-    }
-
-    // Fermeture de la modale d'ajout
-    if (btnCloseAdd && modalAdd) {
-        btnCloseAdd.addEventListener('click', () => {
-            modalAdd.style.display = 'none';
-        });
-    }
-
-    // Soumission du formulaire en AJAX vers api/add_station.php
-    if (formAdd) {
-        formAdd.addEventListener('submit', function(e) {
-            e.preventDefault(); // Empêche le rechargement de la page
-
-            const formData = new FormData(this);
-
-            fetch(`${apiPrefix}add_station.php`, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result && result.success) {
-                    alert('✅ ' + result.message);
-                    modalAdd.style.display = 'none'; // Ferme la fenêtre
-                    formAdd.reset();
-                    document.getElementById('btn-search')?.click(); // Actualise les résultats de recherche automatiquement
-                } else {
-                    alert('❌ Erreur : ' + (result?.error || 'Une erreur est survenue.'));
-                }
-            })
-            .catch(err => {
-                alert('Erreur réseau lors de l\'ajout : ' + err.message);
-            });
-        });
-    }
 });
