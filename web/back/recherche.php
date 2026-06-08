@@ -172,6 +172,6 @@ try {
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="../js/main.js?v=final" id="main-script" data-location="backfolder" data-mode="admin"></script>
+<script src="../js/main.js?v=2" id="main-script" data-location="backfolder" data-mode="admin"></script>
 </body>
 </html>
