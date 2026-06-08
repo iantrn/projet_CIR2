@@ -13,6 +13,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Préfixe pour appeler les fichiers de l'API
     const apiPrefix = isInsideBackFolder ? '../api/' : 'api/';
 
+    // ==========================================
+    // CONFIGURATION DES PARAMÈTRES PAR DÉFAUT
+    // ==========================================
+    // Consigne : Gestion des paramètres par défaut à l'insertion d'une nouvelle installation
+    const CONFIG_DEFAUT = {
+        puissance: "22.00",
+        tarification: "0.40 € / kWh",
+        prise_ef: false,
+        prise_t2: true,       // Activé par défaut (le connecteur standard le plus courant)
+        prise_combo_ccs: false,
+        prise_chademo: false
+    };
+
+
     // --- Gestion du changement de mode (User / Admin) ---
     const btnModeUser  = document.getElementById('btn-mode-user');
     const btnModeAdmin = document.getElementById('btn-mode-admin');
@@ -97,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         L.marker([lat, lon]).bindPopup(popupContent).addTo(markersGroup);
                     });
                 })
-                .catch(err => console.error('Erreur chargement marqueurs :', err));
+                .catch(err => console.error('Erreur chargement marqueurs : ', err));
         }
 
         // Ecouteurs sur les filtres de la carte
@@ -203,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         container.classList.remove('hidden');
                     }
                 })
-                .catch(e => console.error('Erreur recherche :', e));
+                .catch(e => console.error('Erreur recherche : ', e));
         });
     }
 
@@ -255,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p style="margin: 3px 0;"><strong>Câble T2 attaché :</strong> ${hasCable}</p>
                             <p style="margin: 3px 0;"><strong>Raccordement :</strong> ${station.libelle_raccordement || 'Inconnu'}</p>
                             <p style="margin: 3px 0;"><strong>Mise en service :</strong> ${station.date_mise_en_service || 'Inconnue'}</p>
-                            <p style="margin: 5px 0 2px 0;"><strong>Prises dispo :</strong><br>• ${prisesText}</p>
+                            <p style="margin: 4px 0 2px 0;"><strong>Prises dispo :</strong><br>• ${prisesText}</p>
                         </div>
 
                         <div style="margin-bottom: 15px; background: #fffbeb; padding: 10px; border-radius: 8px; border-left: 4px solid #f59e0b;">
@@ -281,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const modalDetail = document.getElementById('modal-detail');
                     if (modalDetail) modalDetail.style.display = 'flex';
                 })
-                .catch(err => console.error("Erreur modale détail :", err));
+                .catch(err => console.error("Erreur modale détail : ", err));
         }
     });
 
@@ -362,6 +376,72 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
         .catch(err => alert('Erreur réseau modif : ' + err.message));
+    });
+
+    // ==========================================
+    // TRAITEMENT DE L'INSERTION (Nouveau Borne)
+    // ==========================================
+
+    // Ouverture de la modale d'ajout + Application des paramètres par défaut
+    const btnOpenAddModal = document.getElementById('btn-open-add-modal');
+    const modalAdd = document.getElementById('modal-add');
+
+    if (btnOpenAddModal && modalAdd) {
+        btnOpenAddModal.addEventListener('click', () => {
+            const form = document.getElementById('form-add-station');
+            if (form) {
+                form.reset(); // Nettoie d'abord les saisies précédentes
+                
+                // Application des paramètres par défaut définis dans l'objet CONFIG_DEFAUT
+                const inputPuissance = form.querySelector('input[name="puissance"]');
+                const inputTarif     = form.querySelector('input[name="tarification"]');
+                const chkEf          = form.querySelector('input[name="prise_ef"]');
+                const chkT2          = form.querySelector('input[name="prise_t2"]');
+                const chkCcs         = form.querySelector('input[name="prise_combo_ccs"]');
+                const chkCha         = form.querySelector('input[name="prise_chademo"]');
+
+                if (inputPuissance) inputPuissance.value = CONFIG_DEFAUT.puissance;
+                if (inputTarif)     inputTarif.value     = CONFIG_DEFAUT.tarification;
+                if (chkEf)          chkEf.checked        = CONFIG_DEFAUT.prise_ef;
+                if (chkT2)          chkT2.checked        = CONFIG_DEFAUT.prise_t2;
+                if (chkCcs)         chkCcs.checked       = CONFIG_DEFAUT.prise_combo_ccs;
+                if (chkCha)         chkCha.checked       = CONFIG_DEFAUT.prise_chademo;
+            }
+            modalAdd.style.display = 'flex';
+        });
+    }
+
+    // Fermeture de la modale d'ajout
+    document.getElementById('btn-close-add')?.addEventListener('click', () => {
+        if (modalAdd) modalAdd.style.display = 'none';
+    });
+
+    // Envoi du formulaire d'ajout en AJAX (fetch)
+    document.getElementById('form-add-station')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const form = e.target;
+        
+        // Utilisation de FormData pour envoyer proprement toutes les variables à add_station.php
+        const formData = new FormData(form);
+
+        fetch(`${apiPrefix}add_station.php`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(r => r.json())
+        .then(result => {
+            if (result && result.success) {
+                alert('✅ Installation ajoutée avec succès !');
+                if (modalAdd) modalAdd.style.display = 'none';
+                form.reset();
+                
+                // Si le bouton de recherche existe sur la page actuelle, on relance pour voir la nouvelle borne
+                document.getElementById('btn-search')?.click();
+            } else {
+                alert('❌ Erreur lors de l\'ajout : ' + (result?.error || 'Inconnue'));
+            }
+        })
+        .catch(err => alert('Erreur réseau lors de l\'ajout : ' + err.message));
     });
 
     // --- Suppression d'une station (Admin uniquement) ---
