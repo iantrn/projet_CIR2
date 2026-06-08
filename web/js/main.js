@@ -390,4 +390,54 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+    // =========================================================================
+    // GESTION DU FORMULAIRE ET DE LA MODALE D'AJOUT DE STATION
+    // =========================================================================
+    const modalAdd = document.getElementById('modal-add');
+    const btnOpenAdd = document.getElementById('btn-open-add-modal');
+    const btnCloseAdd = document.getElementById('btn-close-add');
+    const formAdd = document.getElementById('form-add-station');
+
+    // Ouverture de la modale d'ajout
+    if (btnOpenAdd && modalAdd) {
+        btnOpenAdd.addEventListener('click', () => {
+            formAdd.reset(); // Réinitialise le formulaire à chaque ouverture
+            modalAdd.style.display = 'flex';
+        });
+    }
+
+    // Fermeture de la modale d'ajout
+    if (btnCloseAdd && modalAdd) {
+        btnCloseAdd.addEventListener('click', () => {
+            modalAdd.style.display = 'none';
+        });
+    }
+
+    // Soumission du formulaire en AJAX vers api/add_station.php
+    if (formAdd) {
+        formAdd.addEventListener('submit', function(e) {
+            e.preventDefault(); // Empêche le rechargement de la page
+
+            const formData = new FormData(this);
+
+            fetch(`${apiPrefix}add_station.php`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result && result.success) {
+                    alert('✅ ' + result.message);
+                    modalAdd.style.display = 'none'; // Ferme la fenêtre
+                    formAdd.reset();
+                    document.getElementById('btn-search')?.click(); // Actualise les résultats de recherche automatiquement
+                } else {
+                    alert('❌ Erreur : ' + (result?.error || 'Une erreur est survenue.'));
+                }
+            })
+            .catch(err => {
+                alert('Erreur réseau lors de l\'ajout : ' + err.message);
+            });
+        });
+    }
 });

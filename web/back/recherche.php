@@ -87,7 +87,14 @@ try {
           </select>
         </div>
     
-        <button type="button" class="btn-rechercher" id="btn-search">Rechercher</button>
+        <div style="display: flex; flex-direction: column; gap: 10px; justify-content: center; align-items: center; width: 100%; max-width: 280px; margin-left: 15px; align-self: flex-end;">
+            <button type="button" class="btn-rechercher" id="btn-search" style="width: 100%; margin: 0; padding: 10px; box-sizing: border-box; height: 40px;">
+            Rechercher
+            </button>
+            <button type="button" id="btn-open-add-modal" style="width: 100%; background-color: #2ecc71; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; box-sizing: border-box; font-family: sans-serif; font-size: 14px; height: 40px; display: flex; align-items: center; justify-content: center;">
+            ➕ Ajouter une station
+            </button>
+        </div>
     
       </div>
     </div>
@@ -165,6 +172,59 @@ try {
         </div>
         
         <button id="btn-close-detail" style="margin-top: 20px; width: 100%; padding: 10px; background: #3498db; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">Fermer</button>
+    </div>
+</div>
+<div id="modal-add" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 9999;">
+    <div style="background: white; padding: 25px; border-radius: 12px; max-width: 500px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-family: sans-serif; max-height: 90vh; overflow-y: auto;">
+        <h3 style="margin-top: 0; border-bottom: 2px solid #2ecc71; padding-bottom: 10px; color: #0c1c3e;">➕ Ajouter une nouvelle borne</h3>
+        
+        <form id="form-add-station" style="margin-top: 15px;">
+            <div style="margin-bottom: 12px;">
+                <label style="display:block; font-weight:bold; margin-bottom:4px;">Nom de la station :</label>
+                <input type="text" name="nom_station" required style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px;">
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+                <label style="display:block; font-weight:bold; margin-bottom:4px;">Adresse complète :</label>
+                <input type="text" name="adresse_station" required style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px;">
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                <div style="flex: 1;">
+                    <label style="display:block; font-weight:bold; margin-bottom:4px;">Latitude :</label>
+                    <input type="number" step="any" name="latitude" placeholder="ex: 47.84" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px;">
+                </div>
+                <div style="flex: 1;">
+                    <label style="display:block; font-weight:bold; margin-bottom:4px;">Longitude :</label>
+                    <input type="number" step="any" name="longitude" placeholder="ex: -3.88" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px;">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                <div style="flex: 1;">
+                    <label style="display:block; font-weight:bold; margin-bottom:4px;">Puissance (kW) :</label>
+                    <input type="number" step="0.01" name="puissance" value="22.00" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 12px;">
+                <label style="display:block; font-weight:bold; margin-bottom:4px;">Tarification / Prix :</label>
+                <input type="text" name="tarification" placeholder="ex: 0.40 kw/h" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px;">
+            </div>
+
+            <div style="margin-bottom: 18px; background: #f7fafc; padding: 10px; border-radius: 6px; border: 1px solid #edf2f7;">
+                <label style="display:block; font-weight:bold; margin-bottom:6px;">Prises disponibles :</label>
+                <label style="display:block; margin-bottom:4px;"><input type="checkbox" name="prise_ef" value="1"> Prise Domestique (EF)</label>
+                <label style="display:block; margin-bottom:4px;"><input type="checkbox" name="prise_t2" value="1" checked> Type 2 (Standard AC)</label>
+                <label style="display:block; margin-bottom:4px;"><input type="checkbox" name="prise_combo_ccs" value="1"> Combo CCS (Rapide DC)</label>
+                <label style="display:block;"><input type="checkbox" name="prise_chademo" value="1"> CHAdeMO</label>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" id="btn-close-add" style="background:#e2e8f0; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">Annuler</button>
+                <button type="submit" style="background:#2ecc71; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer; font-weight:bold;">Ajouter</button>
+            </div>
+        </form>
     </div>
 </div>
 <footer class="footer-admin">
