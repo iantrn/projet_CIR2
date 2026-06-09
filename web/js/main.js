@@ -13,9 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Préfixe pour appeler les fichiers de l'API
     const apiPrefix = isInsideBackFolder ? '../api/' : 'api/';
 
-    // ==========================================
-    // CONFIGURATION DES PARAMÈTRES PAR DÉFAUT
-    // ==========================================
     // Consigne : Gestion des paramètres par défaut à l'insertion d'une nouvelle installation
     const CONFIG_DEFAUT = {
         puissance: "22.00",
@@ -27,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 
-    // --- Gestion du changement de mode (User / Admin) ---
+    // Gestion du changement de mode (User / Admin)
     const btnModeUser  = document.getElementById('btn-mode-user');
     const btnModeAdmin = document.getElementById('btn-mode-admin');
 
@@ -51,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Gestion de la carte Leaflet ---
+    // Gestion de la carte Leaflet
     const mapElement = document.getElementById('map');
     if (mapElement) {
         // Centrage de la carte sur la Bretagne
@@ -122,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadMarkers();
     }
 
-    // --- Gestion de la recherche et du tableau ---
+    // Gestion de la recherche et du tableau 
     const btnSearchPage = document.getElementById('btn-search');
     if (btnSearchPage) {
         btnSearchPage.addEventListener('click', () => {
@@ -221,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Gestion de la modale de Détails ---
+    // Gestion de la modale de Détails 
     document.addEventListener('click', (e) => {
         if (e.target && e.target.classList.contains('btn-detail-trigger')) {
             if(e.target.tagName === 'A') { e.preventDefault(); }
@@ -305,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modalDetail) modalDetail.style.display = 'none';
     });
 
-    // --- Gestion de la modale d'édition (Admin uniquement) ---
+    // Gestion de la modale d'édition (Admin uniquement) 
     document.addEventListener('click', (e) => {
         if (e.target && e.target.classList.contains('btn-edit-trigger')) {
             const idStation = e.target.getAttribute('data-id');
@@ -378,9 +375,6 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(err => alert('Erreur réseau modif : ' + err.message));
     });
 
-    // ==========================================
-    // TRAITEMENT DE L'INSERTION (Nouveau Borne)
-    // ==========================================
 
     // Ouverture de la modale d'ajout + Application des paramètres par défaut
     const btnOpenAddModal = document.getElementById('btn-open-add-modal');
@@ -444,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(err => alert('Erreur réseau lors de l\'ajout : ' + err.message));
     });
 
-    // --- Suppression d'une station (Admin uniquement) ---
+    // Suppression d'une station (Admin uniquement) 
     document.addEventListener('click', (e) => {
         if (e.target && e.target.classList.contains('btn-delete-trigger')) {
             const idStation = e.target.getAttribute('data-id');

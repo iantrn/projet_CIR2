@@ -56,7 +56,6 @@ try {
     echo json_encode(['success' => true]);
 
 } catch (PDOException $e) {
-    // Si ça plante, on annule tout pour pas foutre le bazar dans la BDD
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }

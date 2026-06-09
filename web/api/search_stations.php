@@ -7,7 +7,6 @@ try {
     $type_prise = isset($_GET['type_prise']) ? $_GET['type_prise'] : '';
     $departement = isset($_GET['departement']) ? $_GET['departement'] : '';
 
-    // CORRECTION REQUÊTE : On groupe par station et on utilise MAX() pour consolider les données techniques
     $sql = "SELECT s.id_station_interne, 
                    s.nom_station, 
                    s.adresse_station, 
@@ -42,7 +41,6 @@ try {
         $params['departement'] = $departement;
     }
 
-    // On ajoute le GROUP BY indispensable pour fusionner les points de recharge d'une même station
     $sql .= " GROUP BY s.id_station_interne, s.nom_station, s.adresse_station, a.nom_amenageur_operateur, c.nom_commune";
     
     $sql .= " LIMIT 200";

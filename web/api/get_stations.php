@@ -17,7 +17,6 @@ try {
             LEFT JOIN amenageur_operateur a ON p.id_amenageur = a.id_amenageur
             WHERE s.latitude IS NOT NULL AND s.longitude IS NOT NULL";
 
-    // ... (garde le reste de la logique de filtrage inchangée)
     $params = [];
     if (!empty($annee)) { $sql .= " AND YEAR(p.date_mise_en_service) = :annee"; $params['annee'] = (int)$annee; }
     if (!empty($departement)) { $sql .= " AND c.code_dep = :departement"; $params['departement'] = $departement; }
