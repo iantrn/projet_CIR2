@@ -1,1 +1,23 @@
+# Configuration de la base de données (contient les identifiants)
+web/config/db.php
 
+# Fichiers CSV volumineux (données sources, à ne pas versionner)
+database/irve_init.csv
+database/communes-france-2024-limite.csv
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Logs Apache/PHP
+*.log
+
+# Fichiers de configuration d'IDE
+.idea/
+.vscode/
+*.swp
